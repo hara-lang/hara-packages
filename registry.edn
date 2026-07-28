@@ -1,0 +1,6 @@
+{:registry/format 1
+ :registry/name "hara"
+ :registry/identity {:repository "github:hara-lang/hara-identity"
+                     :branch "main"}
+ :registry/packages-root "packages"
+ :registry/requests-root "requests"}
