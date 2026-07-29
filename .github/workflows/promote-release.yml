@@ -1,0 +1,24 @@
+name: Promote verified Hara release
+
+on:
+  workflow_dispatch:
+    inputs:
+      request:
+        description: Request directory to promote
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  promote:
+    environment: package-promotion
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Guard protected promotion boundary
+        run: |
+          echo "Promotion must use a pinned Hara CLI and a GitHub App restricted to hara-lang source repositories."
+          echo "Never expose release-upload or attestation credentials to pull-request verification."
+          exit 1

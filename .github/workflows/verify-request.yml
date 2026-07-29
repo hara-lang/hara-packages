@@ -1,0 +1,23 @@
+name: Verify package request
+
+on:
+  pull_request:
+    paths: [requests/**]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Obtain paired identity policy
+        run: git clone --depth 1 https://github.com/hara-lang/hara-identity.git ../hara-identity
+      - name: Verify request through the Hara CLI
+        env:
+          HARA_CLI_VERSION: 0.1.0
+        run: |
+          echo "Install the pinned Hara CLI release ${HARA_CLI_VERSION} before enabling this workflow."
+          echo "Expected command: hara package registry verify-request --request requests --identity ../hara-identity/identity.edn"
+          exit 1

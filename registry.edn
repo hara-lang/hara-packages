@@ -1,6 +1,8 @@
 {:registry/format 1
  :registry/name "hara"
  :registry/identity {:repository "github:hara-lang/hara-identity"
-                     :branch "main"}
+                     :branch "main"
+                     :trust :github-governed}
+ :registry/api "https://api.hara-lang.org/v1"
  :registry/packages-root "packages"
  :registry/requests-root "requests"}
