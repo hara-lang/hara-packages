@@ -1,0 +1,108 @@
+/* Hara Packages landing page. Tokens come from ./vendor/hara-ui/tokens.css. */
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--hara-abyss);
+  color: var(--hara-text);
+  font-family: var(--hara-mono);
+  line-height: 1.6;
+}
+
+.page {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 4rem 1.5rem 3rem;
+}
+
+.hero { margin-bottom: 3rem; }
+
+.eyebrow {
+  margin: 0 0 1rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.35em;
+  background: var(--hara-spectrum);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+h1 {
+  margin: 0 0 1.25rem;
+  font-family: var(--hara-display);
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--hara-text);
+}
+
+.lede {
+  margin: 0;
+  max-width: 38rem;
+  color: var(--hara-muted);
+  font-size: 0.95rem;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-bottom: 3rem;
+}
+
+.card {
+  display: block;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--hara-line);
+  border-radius: 10px;
+  background: var(--hara-panel);
+  text-decoration: none;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.card:hover {
+  border-color: var(--hara-line-strong);
+  box-shadow: var(--hara-glow-cyan);
+}
+
+.card-path {
+  display: block;
+  color: var(--hara-cyan);
+  font-size: 0.9rem;
+}
+
+.card-note {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--hara-muted);
+  font-size: 0.8rem;
+}
+
+.card-note code {
+  color: var(--hara-text);
+  font-size: 0.78rem;
+}
+
+.usage { margin-bottom: 3rem; }
+
+.usage pre {
+  margin: 0;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--hara-line);
+  border-radius: 10px;
+  background: var(--hara-panel);
+  overflow-x: auto;
+}
+
+.usage code {
+  font-family: var(--hara-mono);
+  font-size: 0.85rem;
+  color: var(--hara-text);
+}
+
+.foot p {
+  margin: 0;
+  color: var(--hara-faint);
+  font-size: 0.78rem;
+}
