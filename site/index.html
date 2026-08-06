@@ -25,12 +25,22 @@
     <link rel="stylesheet" href="./vendor/hara-ui/tokens.css">
     <link rel="stylesheet" href="./page.css">
     <title>Hara Packages</title>
-    <style>
-      body { max-width: 900px; margin: 0 auto; padding: 48px 24px; font: 16px/1.6 system-ui, sans-serif; }
-      footer { display:flex; justify-content:space-between; gap:16px; margin-top:64px; padding-top:20px; border-top:1px solid currentColor; font-size:.82rem; }
-    </style>
   </head>
   <body>
+    <header class="site-header">
+      <a class="brand" href="https://www.hara-lang.org/" aria-label="Hara home">
+        <span class="brand-mark" aria-hidden="true">H</span>
+        <span>Hara</span>
+      </a>
+      <nav aria-label="Hara ecosystem">
+        <a href="https://www.hara-lang.org/">Home</a>
+        <a href="https://specs.hara-lang.org/">Specs</a>
+        <span aria-current="page">Packages</span>
+        <a href="https://id.hara-lang.org/">Identity</a>
+      </nav>
+      <div data-hara-identity></div>
+    </header>
+
     <main class="page">
       <header class="hero">
         <p class="eyebrow">HARA / PACKAGES</p>
@@ -74,11 +84,26 @@ $ hara package install hara/std.http</code></pre>
 
       <footer class="foot">
         <p>Hara Packages — read-only origin for the reviewed registry.</p>
+        <nav>
+          <a href="https://opensource.greenways.ai/open-source/">A Greenways Open Source Project</a>
+          <a href="https://github.com/hara-lang/hara-packages/blob/main/LICENSE">Apache-2.0</a>
+        </nav>
       </footer>
     </main>
-    <footer>
-      <a href="https://opensource.greenways.ai/open-source/">A Greenways Open Source Project</a>
-      <a href="https://github.com/hara-lang/hara-packages/blob/main/LICENSE">Apache-2.0</a>
-    </footer>
+
+    <script>
+      (() => {
+        const testing = location.hostname === "packages.testing.hara-lang.org"
+          || location.hostname.endsWith(".testing.hara-lang.org");
+        const identityOrigin = testing
+          ? "https://id.testing.hara-lang.org"
+          : "https://id.hara-lang.org";
+        const script = document.createElement("script");
+        script.src = `${identityOrigin}/identity-client.js`;
+        script.defer = true;
+        script.dataset.haraIdentityClient = "";
+        document.head.append(script);
+      })();
+    </script>
   </body>
 </html>
