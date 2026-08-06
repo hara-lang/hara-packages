@@ -1,0 +1,45 @@
+name: Validate packages service
+
+on:
+  pull_request:
+    paths:
+      - "site/**"
+      - "packages/**"
+      - "requests/**"
+      - "registry.edn"
+      - "netlify/**"
+      - "netlify.toml"
+      - "test/**"
+      - "package.json"
+      - "README.md"
+      - ".github/workflows/validate.yml"
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "packages/**"
+      - "requests/**"
+      - "registry.edn"
+      - "netlify/**"
+      - "netlify.toml"
+      - "test/**"
+      - "package.json"
+      - "README.md"
+      - ".github/workflows/validate.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: packages-service-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
