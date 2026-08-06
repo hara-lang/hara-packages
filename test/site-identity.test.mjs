@@ -17,5 +17,6 @@ test("renders the shared Hara identity in the package shell", () => {
 test("keeps the brand and identity on the shell borders", () => {
   assert.match(styles, /grid-template-columns: 1fr auto 1fr/);
   assert.match(styles, /\.site-header > \[data-hara-identity\] \{ justify-self: end; \}/);
-  assert.match(page, /Home[\s\S]*Specs[\s\S]*aria-current="page">Packages[\s\S]*Identity/);
+  assert.match(page, /Home[\s\S]*World[\s\S]*Specs[\s\S]*aria-current="page">Packages[\s\S]*Identity/);
+  assert.match(page, /https:\/\/world\.hara-lang\.org\//);
 });
