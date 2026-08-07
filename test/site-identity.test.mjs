@@ -11,6 +11,7 @@ test("renders the shared Hara identity with a local package fallback", () => {
   assert.match(page, /data-hara-identity/);
   assert.match(page, /data-hara-identity-fallback/);
   assert.match(page, /aria-label="Sign in with GitHub"/);
+  assert.match(page, /<meta name="hara-identity-mode" content="popup">/);
   assert.match(page, /https:\/\/id\.hara-lang\.org/);
   assert.match(page, /https:\/\/id\.testing\.hara-lang\.org/);
   assert.match(page, /\/v1\/identity-client\.js/);
