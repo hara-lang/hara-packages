@@ -39,7 +39,9 @@
         <span aria-current="page">Packages</span>
         <a href="https://id.hara-lang.org/">Identity</a>
       </nav>
-      <div data-hara-identity></div>
+      <div data-hara-identity>
+        <a class="sign-in" data-hara-identity-fallback href="https://id.hara-lang.org/" aria-label="Sign in with GitHub">Sign in</a>
+      </div>
     </header>
 
     <main class="page">
@@ -99,8 +101,14 @@ $ hara package install hara/std.http</code></pre>
         const identityOrigin = testing
           ? "https://id.testing.hara-lang.org"
           : "https://id.hara-lang.org";
+        document.querySelectorAll("[data-hara-identity-fallback]").forEach((fallback) => {
+          if (!(fallback instanceof HTMLAnchorElement)) return;
+          const signIn = new URL("/github/start", identityOrigin);
+          signIn.searchParams.set("returnTo", location.href);
+          fallback.href = signIn.href;
+        });
         const script = document.createElement("script");
-        script.src = `${identityOrigin}/identity-client.js`;
+        script.src = `${identityOrigin}/v1/identity-client.js`;
         script.defer = true;
         script.dataset.haraIdentityClient = "";
         document.head.append(script);
