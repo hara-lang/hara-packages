@@ -3,7 +3,7 @@ name: Deploy packages.hara-lang.org
 on:
   push:
     branches: [main, production]
-    paths: [site/**, packages/**, registry.edn, netlify/**, netlify.toml, test/**, package.json, .github/scripts/**, .github/workflows/pages.yml]
+    paths: [site/**, packages/**, requests/**, registry.edn, src/**, scripts/**, netlify/**, netlify.toml, test/**, package.json, .github/scripts/**, .github/workflows/pages.yml]
   pull_request:
     branches: [main, production]
     types: [closed]
@@ -28,8 +28,29 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Test functions
-        run: node --test "test/**/*.test.mjs"
+      - name: Build publication candidate projection
+        run: npm run requests:build
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Preflight published package Showcases
+        run: npm run showcase:preflight
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Build package Gallery index
+        run: npm run gallery:build
+      - name: Validate publication, Showcase and Gallery contracts
+        run: npm run validate
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Verify built shared identity shell
+        run: |
+          grep -Fq 'data-hara-identity' site/index.html
+          grep -Fq 'data-hara-identity-fallback' site/index.html
+          grep -Fq '/v1/identity-client.js' site/index.html
+          if grep -R -E 'HARA_GITHUB_OAUTH_CLIENT_SECRET|HARA_AUTH_SESSION_SECRET|/auth/github/callback' site; then
+            echo 'The Packages artifact must not contain Identity secrets or a local OAuth callback.' >&2
+            exit 1
+          fi
       - name: Deploy main to packages.testing.hara-lang.org
         if: >-
           (github.event_name != 'pull_request' && github.ref_name == 'main') ||
@@ -38,14 +59,6 @@ jobs:
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_TESTING_SITE_ID }}
-      - name: Deploy production to packages.hara-lang.org
-        if: >-
-          (github.event_name != 'pull_request' && github.ref_name == 'production') ||
-          (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'production')
-        run: npx --yes netlify-cli deploy --prod --dir site --message "production ${GITHUB_SHA}"
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_PRODUCTION_SITE_ID }}
       - name: Reconcile packages.testing.hara-lang.org
         if: >-
           (github.event_name != 'pull_request' && github.ref_name == 'main') ||
@@ -55,6 +68,22 @@ jobs:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_TESTING_SITE_ID }}
           NETLIFY_CUSTOM_DOMAIN: packages.testing.hara-lang.org
+      - name: Verify testing shared identity
+        if: >-
+          (github.event_name != 'pull_request' && github.ref_name == 'main') ||
+          (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main')
+        run: bash .github/scripts/verify-shared-identity.sh
+        env:
+          HARA_SITE_ORIGIN: https://packages.testing.hara-lang.org
+          HARA_IDENTITY_ORIGIN: https://id.testing.hara-lang.org
+      - name: Deploy production to packages.hara-lang.org
+        if: >-
+          (github.event_name != 'pull_request' && github.ref_name == 'production') ||
+          (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'production')
+        run: npx --yes netlify-cli deploy --prod --dir site --message "production ${GITHUB_SHA}"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_PRODUCTION_SITE_ID }}
       - name: Reconcile packages.hara-lang.org
         if: >-
           (github.event_name != 'pull_request' && github.ref_name == 'production') ||
@@ -64,3 +93,11 @@ jobs:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_PRODUCTION_SITE_ID }}
           NETLIFY_CUSTOM_DOMAIN: packages.hara-lang.org
+      - name: Verify production shared identity
+        if: >-
+          (github.event_name != 'pull_request' && github.ref_name == 'production') ||
+          (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'production')
+        run: bash .github/scripts/verify-shared-identity.sh
+        env:
+          HARA_SITE_ORIGIN: https://packages.hara-lang.org
+          HARA_IDENTITY_ORIGIN: https://id.hara-lang.org

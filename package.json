@@ -3,6 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test \"test/**/*.test.mjs\""
+    "test": "node --test \"test/**/*.test.mjs\"",
+    "gallery:build": "node scripts/build-gallery-index.mjs",
+    "gallery:check": "node scripts/build-gallery-index.mjs --check",
+    "showcase:preflight": "node scripts/preflight-showcases.mjs",
+    "requests:build": "node scripts/build-publication-candidates.mjs",
+    "requests:check": "node scripts/build-publication-candidates.mjs --check",
+    "validate": "npm test && npm run gallery:check && npm run showcase:preflight && npm run requests:check"
   }
 }

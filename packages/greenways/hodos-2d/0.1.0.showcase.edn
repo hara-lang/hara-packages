@@ -1,0 +1,59 @@
+{:hara/type :showcase
+ :showcase/format 1
+ :showcase/package :greenways/hodos-2d
+ :showcase/version "0.1.0"
+ :showcase/title "Hodos 2D models"
+ :showcase/summary
+ "Inspectable document and typed graph models published with the HAL-first package."
+ :showcase/source
+ {:source/repository "greenways-ai/hodos"
+  :source/branch "main"
+  :source/commit "bc03cd3f1d566c94f961c47cce9cd4850a39be29"
+  :source/root "packages/2d"}
+
+ :showcase/views
+ [{:view/id :document
+   :view/title "Document"
+   :view/summary "Stable block, text and artefact identity with bounded editing events."
+   :view/source "src/gw/hodos/two_d/document.hal"
+   :view/docs "README.md"}
+  {:view/id :graph
+   :view/title "Graph"
+   :view/summary "Typed nodes, ports and connections with semantic selection and movement."
+   :view/source "src/gw/hodos/two_d/graph.hal"
+   :view/docs "README.md"}]
+
+ :showcase/states
+ [{:state/id :document/default
+   :state/title "Editable document"
+   :state/summary "A document with stable text identity and one committed value artefact."
+   :state/file "showcase/states/document-default.edn"}
+  {:state/id :graph/typed-flow
+   :state/title "Typed flow"
+   :state/summary "A source, transform and result connected by number ports."
+   :state/file "showcase/states/graph-typed-flow.edn"}]
+
+ :showcase/demos
+ [{:demo/id :document/default
+   :demo/title "Inspectable document"
+   :demo/summary "Select and edit stable document text while the package model remains data."
+   :demo/view :document
+   :demo/state :document/default
+   :demo/project "showcase/document"
+   :demo/surface :document
+   :demo/docs "showcase/document/README.md"
+   :demo/tags ["document" "identity" "artefact"]
+   :demo/theme :light
+   :demo/viewport {:viewport/width 960 :viewport/height 680}
+   :demo/default true}
+  {:demo/id :graph/typed-flow
+   :demo/title "Typed flow graph"
+   :demo/summary "Select and move graph nodes connected by typed ports."
+   :demo/view :graph
+   :demo/state :graph/typed-flow
+   :demo/project "showcase/graph"
+   :demo/surface :graph
+   :demo/docs "showcase/graph/README.md"
+   :demo/tags ["graph" "typed-ports" "selection"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1100 :viewport/height 720}}]}
