@@ -28,6 +28,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Preflight published package Showcases
+        run: npm run showcase:preflight
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Build package Gallery index
         run: npm run gallery:build
       - name: Test functions and Gallery contracts

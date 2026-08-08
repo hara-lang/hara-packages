@@ -87,6 +87,31 @@ All paths are normalized repository-relative paths. Absolute paths,
 backslashes, empty segments, `.` and `..` are rejected. Source commits must be
 lowercase 40-character Git SHAs.
 
+## Publication preflight
+
+`npm run showcase:preflight` verifies finalized sidecars against their exact
+source commits before validation or deployment succeeds. It performs one
+recursive Git tree request per distinct repository and commit, never resolves a
+branch, and fails closed when the source tree is missing, malformed or
+truncated.
+
+The preflight proves that:
+
+- every declared view source and documentation file exists;
+- every named state file exists, uses `.edn`, stays within the bounded data
+  limit and passes the same data-only EDN reader as registry metadata;
+- every demo path is a complete project containing `project.edn` and
+  `workspace.edn`;
+- each `workspace.edn` declares `:hara/type :workspace`;
+- each demo surface is either a stable Playground surface or a surface declared
+  by the project's Workspace presentation data;
+- demo documentation exists at the immutable commit.
+
+CI and deployment use a read-only GitHub token for tree metadata. Raw project
+and fixture files are fetched from their exact public commit without sending
+that token to the content origin. Repeated versions sharing one source commit
+reuse the same tree and file evidence during a validation run.
+
 ## Generated Gallery index
 
 `npm run gallery:build` validates every finalized sidecar and writes

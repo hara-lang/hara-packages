@@ -49,3 +49,5 @@ jobs:
         with:
           node-version: 22
       - run: npm run validate
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

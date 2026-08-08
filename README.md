@@ -27,7 +27,8 @@ intent, registry validation, and review.
 - `packages/<owner>/<name>/<version>.showcase.edn` — optional reviewed views,
   named states and runnable demos for that exact release.
 - `requests/` — publication requests awaiting review.
-- `src/` — strict EDN and Showcase validation plus Gallery indexing.
+- `src/` — strict EDN, Showcase validation, immutable publication preflight and
+  Gallery indexing.
 - `site/` — generated/static package browser deployed through Netlify.
 
 ## Package Showcases
@@ -39,11 +40,18 @@ origin never executes package code.
 
 ```text
 reviewed release + Showcase sidecar
+    -> immutable source-tree preflight
     -> generated site/gallery.json
     -> packages.hara-lang.org navigation
     -> commit-pinned playground.hara-lang.org iframe
     -> Hara runtime + Hodos view
 ```
+
+`npm run showcase:preflight` verifies every declared source, docs, state and
+demo path at the exact source commit. It also requires complete demo projects,
+parses state fixtures as data-only EDN and proves that each selected surface is
+available in the project's `workspace.edn`. Branches are descriptive only and
+are never resolved during publication preflight.
 
 Showcase metadata cannot contain source snippets, expressions, constructors or
 capability grants. Packages without a Showcase remain valid and installable.
@@ -53,8 +61,9 @@ See [`docs/showcase-format.md`](docs/showcase-format.md).
 
 1. A source tag produces a signed publisher intent.
 2. A reviewed request identifies that immutable source commit.
-3. Registry CI rebuilds the package and verifies the intent and optional
-   `showcase.edn`.
+3. Registry CI rebuilds the package, verifies the intent, validates the optional
+   `showcase.edn`, and preflights all referenced files and surfaces against that
+   exact commit.
 4. A protected publishing job signs the registry attestation and uploads the
    archive and detached metadata to the source release.
 5. The final release record and optional normalized Showcase sidecar are
