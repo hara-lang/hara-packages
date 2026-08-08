@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Explore reviewed Hara packages, demos, named states and views.">
     <meta name="hara-identity-mode" content="popup">
+    <meta name="theme-color" content="#080a0d">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Hara Packages">
     <meta property="og:title" content="Hara Packages — demos, states and source">
@@ -22,38 +23,49 @@
     <meta name="twitter:image" content="https://packages.hara-lang.org/og-hara-packages.jpg">
     <meta name="twitter:image:alt" content="Hara Packages — reviewed package demos and source">
     <link rel="canonical" href="https://packages.hara-lang.org/">
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
-    <link rel="stylesheet" href="./vendor/hara-ui/tokens.css">
+    <link rel="icon" type="image/svg+xml" href="./vendor/visual-language/hara-logo.svg">
+    <link rel="stylesheet" href="./vendor/visual-language/theme.css">
     <link rel="stylesheet" href="./page.css">
+    <link rel="stylesheet" href="./public-shell.css">
+    <link rel="stylesheet" href="./visual-refresh.css">
     <title>Hara Packages</title>
   </head>
   <body>
     <header class="site-header">
       <a class="brand" href="https://www.hara-lang.org/" aria-label="Hara home">
-        <span class="brand-mark" aria-hidden="true">H</span>
-        <span>Hara</span>
+        <svg class="brand-logo" width="27" height="27" viewBox="0 0 64 64" aria-hidden="true">
+          <path fill="currentColor" d="M10 8h13v18h18V8h13v48H41V38H23v18H10z"></path>
+          <path fill="var(--hara-signal)" d="M27 8h10v10H27z"></path>
+        </svg>
+        <span class="brand-name">Hara</span>
+        <span class="brand-product">Packages</span>
       </a>
-      <nav aria-label="Hara ecosystem">
-        <a href="https://www.hara-lang.org/">Home</a>
-        <a href="https://world.hara-lang.org/">World</a>
+      <nav aria-label="Primary">
+        <a href="https://www.hara-lang.org/benchmarks/">Benchmarks</a>
+        <a href="https://www.hara-lang.org/docs/start/orientation/">Docs</a>
         <a href="https://specs.hara-lang.org/">Specs</a>
-        <span aria-current="page">Packages</span>
-        <a href="https://id.hara-lang.org/">Identity</a>
+        <a href="https://world.hara-lang.org/">World</a>
       </nav>
-      <div data-hara-identity>
-        <a class="sign-in" data-hara-identity-fallback href="https://id.hara-lang.org/" aria-label="Sign in with GitHub">Sign in</a>
+      <div class="header-actions">
+        <div data-hara-identity>
+          <a class="sign-in" data-hara-identity-fallback href="https://id.hara-lang.org/" aria-label="Sign in with GitHub">Sign in</a>
+        </div>
+        <button class="hara-theme-toggle" type="button" data-hara-theme-toggle aria-label="Change colour theme">
+          <span aria-hidden="true" data-hara-theme-icon>◐</span>
+          <span data-hara-theme-label>System</span>
+        </button>
       </div>
     </header>
 
     <main class="gallery-page" data-gallery-app data-gallery-status="loading">
       <aside class="gallery-sidebar" aria-label="Package stories">
         <header class="gallery-sidebar-header">
-          <p class="eyebrow">HARA / PACKAGES</p>
+          <p class="eyebrow">HARA / PACKAGE GALLERY</p>
           <div class="gallery-sidebar-title">
-            <h1>Gallery</h1>
+            <h1>Reviewed packages</h1>
             <span data-gallery-count aria-live="polite">…</span>
           </div>
-          <p>Reviewed demos, named states and exact source beside every package release.</p>
+          <p>Named states, exact source and commit-pinned demonstrations beside every reviewed release.</p>
         </header>
 
         <label class="gallery-search">
@@ -222,6 +234,7 @@
       </aside>
     </main>
 
+    <script type="module" src="./theme-toggle.js"></script>
     <script type="module" src="./gallery.js"></script>
     <script>
       (() => {
