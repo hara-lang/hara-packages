@@ -90,7 +90,7 @@ test("rejects unsupported fields, executable EDN and traversal", () => {
       ':repro/toolchain ["hara 0.1.0" "jdk 21"]',
       ':repro/toolchain [(dangerous)]',
     )),
-    /EDN lists are not accepted/,
+    /Lists are not allowed in registry data/,
   );
 });
 
