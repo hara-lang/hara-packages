@@ -17,8 +17,8 @@ requests/<owner>/<name>/<version>.edn
  {:package/name :greenways/hodos-2d
   :package/version "0.1.0"
   :package/namespaces
-  [gw.hodos.two-d.document
-   gw.hodos.two-d.graph]}
+  [:gw.hodos.two-d.document
+   :gw.hodos.two-d.graph]}
 
  :request/source
  {:source/repository "greenways-ai/hodos"
