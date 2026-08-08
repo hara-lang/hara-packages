@@ -24,14 +24,38 @@ intent, registry validation, and review.
 
 - `registry.edn` — registry metadata and schema version.
 - `packages/<owner>/<name>/<version>.edn` — immutable finalized releases.
+- `packages/<owner>/<name>/<version>.showcase.edn` — optional reviewed views,
+  named states and runnable demos for that exact release.
 - `requests/` — publication requests awaiting review.
+- `src/` — strict EDN and Showcase validation plus Gallery indexing.
 - `site/` — generated/static package browser deployed through Netlify.
+
+## Package Showcases
+
+A finalized package may publish a closed declarative Showcase sidecar. It names
+views, bounded EDN states and complete commit-pinned demo projects. The Gallery
+runs demos through the cross-origin Playground Showcase Host; the Packages
+origin never executes package code.
+
+```text
+reviewed release + Showcase sidecar
+    -> generated site/gallery.json
+    -> packages.hara-lang.org navigation
+    -> commit-pinned playground.hara-lang.org iframe
+    -> Hara runtime + Hodos view
+```
+
+Showcase metadata cannot contain source snippets, expressions, constructors or
+capability grants. Packages without a Showcase remain valid and installable.
+See [`docs/showcase-format.md`](docs/showcase-format.md).
 
 ## Publication lifecycle
 
 1. A source tag produces a signed publisher intent.
 2. A reviewed request identifies that immutable source commit.
-3. Registry CI rebuilds the package and verifies the intent.
+3. Registry CI rebuilds the package and verifies the intent and optional
+   `showcase.edn`.
 4. A protected publishing job signs the registry attestation and uploads the
    archive and detached metadata to the source release.
-5. The final release record is committed here and appears in the site index.
+5. The final release record and optional normalized Showcase sidecar are
+   committed here and appear in the site index.

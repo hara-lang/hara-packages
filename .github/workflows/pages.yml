@@ -3,7 +3,7 @@ name: Deploy packages.hara-lang.org
 on:
   push:
     branches: [main, production]
-    paths: [site/**, packages/**, registry.edn, netlify/**, netlify.toml, test/**, package.json, .github/scripts/**, .github/workflows/pages.yml]
+    paths: [site/**, packages/**, registry.edn, src/**, scripts/**, netlify/**, netlify.toml, test/**, package.json, .github/scripts/**, .github/workflows/pages.yml]
   pull_request:
     branches: [main, production]
     types: [closed]
@@ -28,8 +28,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Test functions
-        run: node --test "test/**/*.test.mjs"
+      - name: Build package Gallery index
+        run: npm run gallery:build
+      - name: Test functions and Gallery contracts
+        run: npm test
       - name: Verify built shared identity shell
         run: |
           grep -Fq 'data-hara-identity' site/index.html
