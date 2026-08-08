@@ -102,7 +102,12 @@ test("materializes and preflights a source-local Showcase at the request commit"
     `https://raw.example/greenways-ai/hodos/${COMMIT}/packages/2d/showcase.edn`,
   );
   assert.deepEqual(calls[0].options.headers, { Accept: "text/plain" });
-  assert.deepEqual(preflightCalls[0].manifest.source, request().source);
+  assert.deepEqual(preflightCalls[0].manifest.source, {
+    repository: "greenways-ai/hodos",
+    branch: "main",
+    commit: COMMIT,
+    root: "packages/2d",
+  });
   assert.equal(preflightCalls[0].options.tokenValue, "read-token");
   assert.equal(candidate.release.target, "packages/greenways/hodos-2d/0.1.0.edn");
   assert.equal(candidate.release.record["source/root"], "packages/2d");
