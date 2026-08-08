@@ -3,6 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test \"test/**/*.test.mjs\""
+    "test": "node --test \"test/**/*.test.mjs\"",
+    "gallery:build": "node scripts/build-gallery-index.mjs",
+    "gallery:check": "node scripts/build-gallery-index.mjs --check",
+    "validate": "npm test && npm run gallery:check"
   }
 }
