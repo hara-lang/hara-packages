@@ -1,0 +1,54 @@
+{:hara/type :showcase
+ :showcase/format 1
+ :showcase/package :greenways/hodos-workspace-ui
+ :showcase/version "0.1.0"
+ :showcase/title "Hodos Workspace UI"
+ :showcase/summary
+ "Desktop and compact projections of one serializable Hara Workspace contract."
+ :showcase/source
+ {:source/repository "greenways-ai/hodos"
+  :source/branch "main"
+  :source/commit "bc03cd3f1d566c94f961c47cce9cd4850a39be29"
+  :source/root "packages/workspace-ui"}
+
+ :showcase/views
+ [{:view/id :workspace-shell
+   :view/title "Workspace shell"
+   :view/summary "Recursive split layout, responsive surfaces, and deterministic area hosting."
+   :view/source "src/shell.js"
+   :view/docs "README.md"}]
+
+ :showcase/states
+ [{:state/id :workspace/desktop
+   :state/title "Desktop split layout"
+   :state/summary "Files, code, and preview are visible in a recursive horizontal layout."
+   :state/file "showcase/states/desktop.edn"}
+  {:state/id :workspace/compact
+   :state/title "Compact surface"
+   :state/summary "One selected surface is visible while the compact dock retains navigation."
+   :state/file "showcase/states/compact.edn"}]
+
+ :showcase/demos
+ [{:demo/id :workspace/desktop
+   :demo/title "Desktop Workspace shell"
+   :demo/summary "A semantic preview of recursive areas, split ratios, and application-owned state."
+   :demo/view :workspace-shell
+   :demo/state :workspace/desktop
+   :demo/project "showcase/desktop-shell"
+   :demo/surface :preview
+   :demo/docs "showcase/desktop-shell/README.md"
+   :demo/tags ["workspace" "layout" "desktop"]
+   :demo/theme :light
+   :demo/viewport {:viewport/width 1200 :viewport/height 760}
+   :demo/default true}
+  {:demo/id :workspace/compact
+   :demo/title "Compact Workspace surface"
+   :demo/summary "A semantic preview of responsive surface selection and focus hand-off."
+   :demo/view :workspace-shell
+   :demo/state :workspace/compact
+   :demo/project "showcase/compact-shell"
+   :demo/surface :preview
+   :demo/docs "showcase/compact-shell/README.md"
+   :demo/tags ["workspace" "responsive" "compact"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 430 :viewport/height 820}}]}

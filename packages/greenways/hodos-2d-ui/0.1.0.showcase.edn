@@ -1,0 +1,59 @@
+{:hara/type :showcase
+ :showcase/format 1
+ :showcase/package :greenways/hodos-2d-ui
+ :showcase/version "0.1.0"
+ :showcase/title "Hodos 2D UI hosts"
+ :showcase/summary
+ "Safe visible Document and Graph mechanics over declarative Workspace models."
+ :showcase/source
+ {:source/repository "greenways-ai/hodos"
+  :source/branch "main"
+  :source/commit "bc03cd3f1d566c94f961c47cce9cd4850a39be29"
+  :source/root "packages/2d-ui"}
+
+ :showcase/views
+ [{:view/id :document-host
+   :view/title "Document DOM host"
+   :view/summary "Stable editable text, safe artefact slots, focus restoration and deterministic disposal."
+   :view/source "src/document-dom-host.js"
+   :view/docs "README.md"}
+  {:view/id :graph-host
+   :view/title "Graph DOM/SVG host"
+   :view/summary "Typed SVG connections, stable nodes and bounded pointer gestures."
+   :view/source "src/graph-dom-host.js"
+   :view/docs "README.md"}]
+
+ :showcase/states
+ [{:state/id :document-host/editable
+   :state/title "Editable document host"
+   :state/summary "Selection and text editing are enabled; structural mutation remains disabled."
+   :state/file "showcase/states/document-host-editable.edn"}
+  {:state/id :graph-host/selected
+   :state/title "Selected graph host"
+   :state/summary "One stable node is selected and may be moved."
+   :state/file "showcase/states/graph-host-selected.edn"}]
+
+ :showcase/demos
+ [{:demo/id :document-host/editable
+   :demo/title "Safe editable document"
+   :demo/summary "The default DOM host projects a bounded document model without HTML injection."
+   :demo/view :document-host
+   :demo/state :document-host/editable
+   :demo/project "showcase/document-host"
+   :demo/surface :document
+   :demo/docs "showcase/document-host/README.md"
+   :demo/tags ["dom" "document" "focus"]
+   :demo/theme :light
+   :demo/viewport {:viewport/width 960 :viewport/height 680}
+   :demo/default true}
+  {:demo/id :graph-host/selected
+   :demo/title "Safe typed graph"
+   :demo/summary "The SVG host keeps selection canonical and pointer drag transient."
+   :demo/view :graph-host
+   :demo/state :graph-host/selected
+   :demo/project "showcase/graph-host"
+   :demo/surface :graph
+   :demo/docs "showcase/graph-host/README.md"
+   :demo/tags ["svg" "graph" "pointer"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1100 :viewport/height 720}}]}
