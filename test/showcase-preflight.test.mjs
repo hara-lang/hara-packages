@@ -57,14 +57,16 @@ function response(body, { status = 200, text = false } = {}) {
 
 function fixture({ tree = { sha: "tree-sha", truncated: false, tree: entries }, workspace = null, state = null } = {}) {
   const calls = [];
-  const workspaceBody = JSON.stringify(workspace || {
+  const workspaceValue = workspace || {
     "hara/type": ":workspace",
     "workspace/selection": { "surface/id": ":document" },
     "workspace/areas": [{
       "area/presentation": { "presentation/surface": ":document" },
     }],
-  });
-  const stateBody = JSON.stringify(state || { title: "Hello" });
+  };
+  const stateValue = state || { title: "Hello" };
+  const workspaceBody = typeof workspaceValue === "string" ? workspaceValue : JSON.stringify(workspaceValue);
+  const stateBody = typeof stateValue === "string" ? stateValue : JSON.stringify(stateValue);
   const fetchImpl = async (url, options) => {
     calls.push({ url: String(url), options });
     if (String(url).includes("/git/trees/")) return response(tree);
@@ -103,6 +105,22 @@ test("preflights every declared source path at the exact immutable commit", asyn
   assert.equal(calls[0].options.headers.Authorization, "Bearer token");
   assert.equal(calls.some(({ url }) => url.endsWith("/examples/showcase/card-default/workspace.edn")), true);
   assert.equal(calls.some(({ url }) => url.endsWith("/examples/showcase/states/default.edn")), true);
+});
+
+test("uses the registry data-only EDN reader for Workspace and state fixtures", async () => {
+  const { fetchImpl } = fixture({
+    workspace: `{:hara/type :workspace
+                 :workspace/selection {:surface/id :document}
+                 :workspace/areas
+                 [{:area/presentation {:presentation/surface :document}}]}`,
+    state: `{:title "Hello" :items [1 2 3] :tone :calm}`,
+  });
+  const evidence = await preflightShowcase(showcase(), { fetchImpl });
+  assert.equal(evidence.projects[0].surfaces.includes("document"), true);
+  assert.deepEqual(evidence.states, [{
+    id: "default",
+    path: "examples/showcase/states/default.edn",
+  }]);
 });
 
 test("fails closed for missing paths, truncated trees and undeclared surfaces", async () => {
