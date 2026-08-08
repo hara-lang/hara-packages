@@ -1,0 +1,42 @@
+name: Package Gallery browser
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/gallery-browser.yml"
+      - "scripts/verify-gallery-browser.mjs"
+      - "site/**"
+      - "test/gallery-ui.test.mjs"
+  push:
+    branches: [main, production]
+    paths:
+      - ".github/workflows/gallery-browser.yml"
+      - "scripts/verify-gallery-browser.mjs"
+      - "site/**"
+      - "test/gallery-ui.test.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gallery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validate registry and Gallery contracts
+        run: npm run validate
+
+      - name: Install pinned browser tooling
+        run: |
+          npm install --no-save --ignore-scripts --package-lock=false playwright@1.53.2
+          npx playwright install --with-deps chromium
+
+      - name: Exercise the Storybook-style Package Gallery
+        run: node scripts/verify-gallery-browser.mjs
