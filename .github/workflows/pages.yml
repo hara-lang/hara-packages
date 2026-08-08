@@ -91,7 +91,7 @@ jobs:
           NETLIFY_CUSTOM_DOMAIN: packages.hara-lang.org
       - name: Verify production shared identity
         if: >-
-          (github.event_name != 'pull_request' && github.event.pull_request.base.ref == 'production') ||
+          (github.event_name != 'pull_request' && github.ref_name == 'production') ||
           (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'production')
         run: bash .github/scripts/verify-shared-identity.sh
         env:
