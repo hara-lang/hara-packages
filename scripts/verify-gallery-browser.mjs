@@ -161,6 +161,23 @@ try {
 
   browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+  let identityClientRequests = 0;
+  await context.route("https://id.hara-lang.org/v1/identity-client.js", async (route) => {
+    identityClientRequests += 1;
+    await route.fulfill({
+      status: 200,
+      headers: {
+        "access-control-allow-origin": "*",
+        "cache-control": "no-store",
+        "content-type": "text/javascript; charset=utf-8",
+        "cross-origin-resource-policy": "cross-origin",
+      },
+      body: `document.querySelectorAll("[data-hara-identity]").forEach((root) => {
+        root.dataset.state = "fixture-signed-out";
+      });`,
+    });
+  });
+
   const page = await context.newPage();
   const pageErrors = [];
   const consoleErrors = [];
@@ -199,6 +216,7 @@ try {
   url.searchParams.set("demo", "card/default");
   await page.goto(url.href, { waitUntil: "domcontentloaded", timeout: 15_000 });
 
+  await page.waitForSelector('[data-hara-identity][data-state="fixture-signed-out"]', { timeout: 10_000 });
   await page.waitForSelector('.demo-story[aria-current="true"]', { state: "visible", timeout: 10_000 });
   await page.waitForFunction(() =>
     document.querySelector("[data-gallery-runtime-status]")?.textContent?.startsWith("Ready"),
@@ -259,10 +277,12 @@ try {
     body: JSON.stringify({ format: 1, registry: "hara", packages: [] }),
   }));
   await emptyPage.goto(origin, { waitUntil: "domcontentloaded", timeout: 15_000 });
+  await emptyPage.waitForSelector('[data-hara-identity][data-state="fixture-signed-out"]', { timeout: 10_000 });
   await emptyPage.waitForSelector("[data-gallery-empty]", { state: "visible", timeout: 5_000 });
   assert.match(await emptyPage.locator("[data-gallery-empty]").textContent(), /Publish the demo beside the code/);
   assert.equal(await emptyPage.locator("[data-gallery-count]").textContent(), "0 stories");
 
+  assert.ok(identityClientRequests >= 1, "Gallery did not request the versioned shared Identity client");
   assert.deepEqual(pageErrors, [], `Package Gallery page errors:\n${pageErrors.join("\n")}`);
   assert.deepEqual(consoleErrors, [], `Package Gallery console errors:\n${consoleErrors.join("\n")}`);
   console.log("Verified package navigation, Canvas, State, Source, Docs, surface control, deep links and empty state in Chromium.");
