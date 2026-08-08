@@ -32,6 +32,10 @@ jobs:
         run: npm run requests:build
         env:
           GITHUB_TOKEN: ${{ github.token }}
+      - name: Preflight published package Showcases
+        run: npm run showcase:preflight
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Build package Gallery index
         run: npm run gallery:build
       - name: Validate publication, Showcase and Gallery contracts
