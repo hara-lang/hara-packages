@@ -5,7 +5,7 @@ export const PUBLICATION_REQUEST_FORMAT = 1;
 export const PUBLICATION_REQUEST_SUFFIX = ".edn";
 
 const PACKAGE_ID = /^[a-z][a-z0-9.-]{0,62}\/[a-z][a-z0-9._-]{0,62}$/;
-const VERSION = /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
+const VERSION = /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
 const REPOSITORY = /^[A-Za-z0-9_.-]{1,100}\/[A-Za-z0-9_.-]{1,100}$/;
 const COMMIT = /^[0-9a-f]{40}$/;
 const SHA256 = /^[0-9a-f]{64}$/;
