@@ -83,7 +83,7 @@ test("rejects unsupported fields, executable EDN and traversal", () => {
       ':request/showcase {:showcase/path "showcase.edn"}',
       ':request/showcase {:showcase/path "../showcase.edn"}',
     )),
-    /cannot contain '\.\.'/,
+    /normalized relative path/,
   );
   assert.throws(
     () => parsePublicationRequest(request().replace(
