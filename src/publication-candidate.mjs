@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { posix } from "node:path";
-import { parseShowcaseManifest } from "./showcase.mjs";
+import { parseShowcaseAuthoringManifest } from "./showcase-authoring.mjs";
 import { preflightShowcase } from "./showcase-preflight.mjs";
 
 export const PUBLICATION_CANDIDATE_FORMAT = 1;
@@ -38,7 +38,7 @@ export function rawPublicationSourceUrl(source, path, origin = "https://raw.gith
   return `${origin}/${encodeURIComponent(owner)}/${encodeURIComponent(repository)}/${source.commit}/${encodedPath(path)}`;
 }
 
-async function fetchShowcaseSource(request, {
+export async function fetchShowcaseSource(request, {
   fetchImpl,
   rawOrigin,
 } = {}) {
@@ -90,6 +90,7 @@ function releaseCandidateRecord(request) {
     "source/commit": request.source.commit,
     ...(request.source.tag ? { "source/tag": request.source.tag } : {}),
     ...(request.source.workflowRun ? { "source/workflow-run": request.source.workflowRun } : {}),
+    "source/root": request.source.root,
     "repro/build-command": request.reproducibility.buildCommand,
     "repro/toolchain": request.reproducibility.toolchain,
     "repro/artifact-sha256": request.artifact.sha256,
@@ -97,24 +98,6 @@ function releaseCandidateRecord(request) {
     "registry/request": request.requestPath,
     "registry/status": ":candidate",
   };
-}
-
-function assertShowcaseIdentity(request, showcase) {
-  if (showcase.source.repository !== request.source.repository) {
-    throw new Error(
-      `Publication Showcase source ${showcase.source.repository} does not match request source ${request.source.repository}`,
-    );
-  }
-  if (showcase.source.commit !== request.source.commit) {
-    throw new Error(
-      `Publication Showcase commit ${showcase.source.commit} does not match request commit ${request.source.commit}`,
-    );
-  }
-  if (request.source.branch && showcase.source.branch && showcase.source.branch !== request.source.branch) {
-    throw new Error(
-      `Publication Showcase branch ${showcase.source.branch} does not match request branch ${request.source.branch}`,
-    );
-  }
 }
 
 export async function preparePublicationCandidate(request, {
@@ -136,11 +119,11 @@ export async function preparePublicationCandidate(request, {
   let showcase = null;
   if (request.showcase) {
     const fetched = await fetchShowcaseSource(request, { fetchImpl, rawOrigin });
-    const manifest = parseShowcaseManifest(fetched.source, {
+    const manifest = parseShowcaseAuthoringManifest(fetched.source, {
       expectedPackage: packageId,
       expectedVersion: version,
+      source: request.source,
     });
-    assertShowcaseIdentity(request, manifest);
     const evidence = await preflight(manifest, {
       fetchImpl,
       tokenValue,
@@ -152,6 +135,7 @@ export async function preparePublicationCandidate(request, {
       requestPath: request.showcase.path,
       sourcePath: fetched.path,
       sourceSha256: sha256(fetched.source),
+      manifestSha256: sha256(stableJson(manifest)),
       manifest,
       evidence,
     };
