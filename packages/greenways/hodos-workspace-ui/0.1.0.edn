@@ -1,0 +1,12 @@
+{:hara/type :package-release-preview
+ :release/format 1
+ :package/name :greenways/hodos-workspace-ui
+ :package/version "0.1.0"
+ :source/repository "greenways-ai/hodos"
+ :source/branch "main"
+ :source/commit "bc03cd3f1d566c94f961c47cce9cd4850a39be29"
+ :source/root "packages/workspace-ui"
+ :registry/channel :testing
+ :registry/status :preview
+ :registry/note
+ "Unsigned testing Gallery preview. This record is not an installable or production Hara package release."}

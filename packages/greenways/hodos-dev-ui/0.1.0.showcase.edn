@@ -1,0 +1,95 @@
+{:hara/type :showcase
+ :showcase/format 1
+ :showcase/package :greenways/hodos-dev-ui
+ :showcase/version "0.1.0"
+ :showcase/title "Hodos Dev UI hosts"
+ :showcase/summary
+ "Trusted visible Explorer, Editor, Preview and REPL adapters driven by serializable Hodos Dev models."
+ :showcase/source
+ {:source/repository "greenways-ai/hodos"
+  :source/branch "main"
+  :source/commit "bc03cd3f1d566c94f961c47cce9cd4850a39be29"
+  :source/root "packages/dev-ui"}
+
+ :showcase/views
+ [{:view/id :explorer-host
+   :view/title "Explorer host"
+   :view/summary "A visible workspace-entry host with deterministic model updates and disposal."
+   :view/source "src/index.js"
+   :view/docs "README.md"}
+  {:view/id :editor-host
+   :view/title "Editor host"
+   :view/summary "A trusted editor adapter that keeps source authority with Hara and the product."
+   :view/source "src/index.js"
+   :view/docs "README.md"}
+  {:view/id :preview-host
+   :view/title "Preview host"
+   :view/summary "An injected preview service behind the Hodos Workspace component contract."
+   :view/source "src/index.js"
+   :view/docs "README.md"}
+  {:view/id :repl-host
+   :view/title "REPL host"
+   :view/summary "A visible session console emitting only declared semantic events."
+   :view/source "src/index.js"
+   :view/docs "README.md"}]
+
+ :showcase/states
+ [{:state/id :explorer-host/project
+   :state/title "Explorer host lifecycle"
+   :state/file "showcase/states/explorer-host.edn"}
+  {:state/id :editor-host/live
+   :state/title "Editor host lifecycle"
+   :state/file "showcase/states/editor-host.edn"}
+  {:state/id :preview-host/ready
+   :state/title "Preview host lifecycle"
+   :state/file "showcase/states/preview-host.edn"}
+  {:state/id :repl-host/ready
+   :state/title "REPL host lifecycle"
+   :state/file "showcase/states/repl-host.edn"}]
+
+ :showcase/demos
+ [{:demo/id :explorer-host/project
+   :demo/title "Visible project Explorer"
+   :demo/summary "Exercise the Playground's trusted Hodos Explorer integration on an immutable project."
+   :demo/view :explorer-host
+   :demo/state :explorer-host/project
+   :demo/project "showcase/explorer-host"
+   :demo/surface :files
+   :demo/docs "showcase/explorer-host/README.md"
+   :demo/tags ["explorer" "dom" "lifecycle"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1100 :viewport/height 720}
+   :demo/default true}
+  {:demo/id :editor-host/live
+   :demo/title "Visible Hara editor"
+   :demo/summary "Exercise the trusted editor host with live source and semantic Workspace events."
+   :demo/view :editor-host
+   :demo/state :editor-host/live
+   :demo/project "showcase/editor-host"
+   :demo/surface :code
+   :demo/docs "showcase/editor-host/README.md"
+   :demo/tags ["editor" "dom" "input"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1100 :viewport/height 720}}
+  {:demo/id :preview-host/ready
+   :demo/title "Isolated preview host"
+   :demo/summary "Render an ordinary Hara interface value through the injected preview service."
+   :demo/view :preview-host
+   :demo/state :preview-host/ready
+   :demo/project "showcase/preview-host"
+   :demo/surface :preview
+   :demo/docs "showcase/preview-host/README.md"
+   :demo/tags ["preview" "sandbox" "host"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 900 :viewport/height 620}}
+  {:demo/id :repl-host/ready
+   :demo/title "Visible session console"
+   :demo/summary "Use the Playground's Hodos REPL host against a ready Hara namespace."
+   :demo/view :repl-host
+   :demo/state :repl-host/ready
+   :demo/project "showcase/repl-host"
+   :demo/surface :repl
+   :demo/docs "showcase/repl-host/README.md"
+   :demo/tags ["repl" "console" "session"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 900 :viewport/height 620}}]}

@@ -1,0 +1,39 @@
+name: Prepare Hodos Showcase preview
+
+on:
+  push:
+    branches: [agent/hodos-showcase-preview]
+    paths: [.github/workflows/prepare-hodos-showcase-preview.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/hodos-showcase-preview
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate and validate the testing Gallery
+        run: |
+          npm run gallery:build
+          npm run validate
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Commit the generated Gallery index
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/gallery.json
+          git diff --cached --check
+          git commit -m "Build Hodos Showcase preview index"
+          git push origin HEAD:agent/hodos-showcase-preview

@@ -1,0 +1,99 @@
+{:hara/type :showcase
+ :showcase/format 1
+ :showcase/package :greenways/hodos-dev
+ :showcase/version "0.1.0"
+ :showcase/title "Hodos Dev models"
+ :showcase/summary
+ "Serializable Explorer, Editor, Preview and REPL Workspace areas with closed semantic-event contracts."
+ :showcase/source
+ {:source/repository "greenways-ai/hodos"
+  :source/branch "main"
+  :source/commit "bc03cd3f1d566c94f961c47cce9cd4850a39be29"
+  :source/root "packages/dev"}
+
+ :showcase/views
+ [{:view/id :explorer
+   :view/title "Explorer"
+   :view/summary "Canonical workspace entries, selection, expansion, status and capabilities."
+   :view/source "src/gw/hodos/dev/explorer.hal"
+   :view/docs "README.md"}
+  {:view/id :editor
+   :view/title "Editor"
+   :view/summary "Document source, selection, completion and structural-editing preferences."
+   :view/source "src/gw/hodos/dev/editor.hal"
+   :view/docs "README.md"}
+  {:view/id :preview
+   :view/title "Preview"
+   :view/summary "A bounded render projection whose sandbox remains host policy."
+   :view/source "src/gw/hodos/dev/preview.hal"
+   :view/docs "README.md"}
+  {:view/id :repl
+   :view/title "REPL"
+   :view/summary "Session identity, namespace, status, input and transcript entries."
+   :view/source "src/gw/hodos/dev/repl.hal"
+   :view/docs "README.md"}]
+
+ :showcase/states
+ [{:state/id :explorer/project
+   :state/title "Project files"
+   :state/summary "A selected Hara source file inside an expanded project tree."
+   :state/file "showcase/states/explorer-project.edn"}
+  {:state/id :editor/live
+   :state/title "Live Hara document"
+   :state/summary "A ready Hara document with a stable selection and editor preferences."
+   :state/file "showcase/states/editor-live.edn"}
+  {:state/id :preview/ready
+   :state/title "Ready interface value"
+   :state/summary "A dark preview projection backed by an ordinary Hara value."
+   :state/file "showcase/states/preview-ready.edn"}
+  {:state/id :repl/ready
+   :state/title "Ready session"
+   :state/summary "A Hara session with input and retained result entries."
+   :state/file "showcase/states/repl-ready.edn"}]
+
+ :showcase/demos
+ [{:demo/id :explorer/project
+   :demo/title "Explore a Hara project"
+   :demo/summary "Inspect the complete immutable story project through the live files surface."
+   :demo/view :explorer
+   :demo/state :explorer/project
+   :demo/project "showcase/explorer"
+   :demo/surface :files
+   :demo/docs "showcase/explorer/README.md"
+   :demo/tags ["explorer" "workspace" "files"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1100 :viewport/height 720}
+   :demo/default true}
+  {:demo/id :editor/live
+   :demo/title "Edit a Hara value"
+   :demo/summary "Open the package story source in the live Hodos editor surface."
+   :demo/view :editor
+   :demo/state :editor/live
+   :demo/project "showcase/editor"
+   :demo/surface :code
+   :demo/docs "showcase/editor/README.md"
+   :demo/tags ["editor" "hara" "paredit"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1100 :viewport/height 720}}
+  {:demo/id :preview/ready
+   :demo/title "Render an interface value"
+   :demo/summary "Evaluate an ordinary Hara value through the isolated preview surface."
+   :demo/view :preview
+   :demo/state :preview/ready
+   :demo/project "showcase/preview"
+   :demo/surface :preview
+   :demo/docs "showcase/preview/README.md"
+   :demo/tags ["preview" "hta" "sandbox"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 900 :viewport/height 620}}
+  {:demo/id :repl/ready
+   :demo/title "Use a Hara session"
+   :demo/summary "Inspect and extend a ready namespace through the live REPL surface."
+   :demo/view :repl
+   :demo/state :repl/ready
+   :demo/project "showcase/repl"
+   :demo/surface :repl
+   :demo/docs "showcase/repl/README.md"
+   :demo/tags ["repl" "session" "values"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 900 :viewport/height 620}}]}
