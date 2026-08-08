@@ -1,0 +1,352 @@
+/* Public precision-material skin for the Package Gallery.
+   Workbench mechanics remain in page.css; this layer replaces the former
+   cyan/magenta editor identity with the public Hara visual language. */
+
+:root {
+  color-scheme: light dark;
+  --gallery-header: 64px;
+  --gallery-sidebar: 296px;
+  --gallery-details: 320px;
+
+  /* Compatibility aliases for the existing workbench stylesheet. */
+  --hara-abyss: var(--hara-bg);
+  --hara-panel: var(--hara-surface-solid);
+  --hara-raised: var(--hara-surface-raised);
+  --hara-overlay: var(--hara-surface-raised);
+  --hara-cyan: var(--hara-signal);
+  --hara-cyan-bright: var(--hara-signal-soft);
+  --hara-magenta: var(--hara-signal);
+  --hara-green: var(--hara-success);
+  --hara-violet: var(--hara-signal);
+  --hara-amber: var(--hara-warning);
+  --hara-spectrum: linear-gradient(var(--hara-text), var(--hara-text));
+  --hara-spectrum-soft: var(--hara-surface-raised);
+  --hara-glow-cyan: none;
+  --hara-glow-magenta: none;
+  --hara-mono: var(--hara-font-mono);
+  --hara-display: var(--hara-font-sans);
+}
+
+body {
+  color: var(--hara-text);
+  background: var(--hara-bg);
+  font-family: var(--hara-font-sans);
+}
+
+button,
+input,
+select { font-family: var(--hara-font-sans); }
+
+code,
+pre,
+kbd,
+.gallery-facts dd,
+.gallery-statusbar,
+.gallery-breadcrumb { font-family: var(--hara-font-mono); }
+
+.gallery-page {
+  grid-template-columns: var(--gallery-sidebar) minmax(0, 1fr) var(--gallery-details);
+  height: calc(100dvh - var(--gallery-header));
+  background: var(--hara-bg);
+}
+
+.gallery-sidebar,
+.gallery-details {
+  position: relative;
+  isolation: isolate;
+  background: var(--hara-surface-solid);
+}
+
+.gallery-sidebar::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--hara-surface-solid) 88%, transparent), var(--hara-surface-solid) 48%),
+    url("./vendor/visual-language/backgrounds/ast-field.svg") 54% 16% / auto 72% no-repeat;
+  opacity: .34;
+}
+
+.gallery-sidebar { border-right-color: var(--hara-line); }
+.gallery-details { border-left-color: var(--hara-line); }
+
+.gallery-sidebar-header {
+  padding: 1.55rem 1.25rem 1rem;
+  border-bottom: 1px solid transparent;
+}
+
+.eyebrow,
+.panel-kicker {
+  color: var(--hara-signal);
+  font-family: var(--hara-font-sans);
+  font-size: .67rem;
+  font-weight: 720;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.gallery-sidebar h1 {
+  font-family: var(--hara-font-sans);
+  font-size: 1.62rem;
+  font-weight: 710;
+  letter-spacing: -.045em;
+}
+
+.gallery-sidebar-title span { font-family: var(--hara-font-mono); }
+.gallery-sidebar-header > p:last-child { color: var(--hara-muted); font-size: .75rem; }
+
+.gallery-search {
+  margin: .1rem .85rem .9rem;
+  padding: .58rem .68rem;
+  color: var(--hara-muted);
+  border-color: var(--hara-line);
+  border-radius: var(--hara-radius-sm);
+  background: color-mix(in srgb, var(--hara-bg-clean) 90%, transparent);
+}
+
+.gallery-search:focus-within {
+  border-color: var(--hara-signal);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--hara-signal) 14%, transparent);
+}
+
+.gallery-search input { color: var(--hara-text); font-family: var(--hara-font-sans); }
+.gallery-search kbd { border-color: var(--hara-line); color: var(--hara-faint); }
+.gallery-tree { scrollbar-color: var(--hara-line-strong) transparent; }
+
+.package-group > summary,
+.version-group > summary,
+.view-group > summary,
+.demo-story {
+  border-radius: 5px;
+  color: var(--hara-muted);
+  font-family: var(--hara-font-sans);
+}
+
+.package-group > summary:hover,
+.version-group > summary:hover,
+.view-group > summary:hover,
+.demo-story:hover {
+  color: var(--hara-text);
+  background: var(--hara-surface-raised);
+}
+
+.package-group > summary { color: var(--hara-text); font-weight: 690; }
+.view-group > summary { color: var(--hara-muted); }
+
+.demo-story::before {
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
+}
+
+.demo-story[aria-current="true"] {
+  color: var(--hara-text);
+  background: color-mix(in srgb, var(--hara-signal) 8%, var(--hara-surface-raised));
+  box-shadow: inset 2px 0 var(--hara-signal);
+}
+
+.demo-story[aria-current="true"]::before {
+  border-color: var(--hara-signal);
+  background: var(--hara-signal);
+  box-shadow: none;
+}
+
+.gallery-registry-links {
+  background: color-mix(in srgb, var(--hara-surface-raised) 34%, transparent);
+}
+
+.gallery-registry-links a { color: var(--hara-faint); font-family: var(--hara-font-sans); }
+.gallery-registry-links a:hover { color: var(--hara-signal); }
+
+.gallery-workbench { background: var(--hara-bg-clean); }
+
+.gallery-toolbar {
+  border-bottom-color: var(--hara-line);
+  background: color-mix(in srgb, var(--hara-surface-solid) 94%, transparent);
+}
+
+.icon-button {
+  border-color: var(--hara-line);
+  border-radius: var(--hara-radius-sm);
+  color: var(--hara-muted);
+}
+
+.gallery-breadcrumb { font-size: .67rem; }
+.gallery-breadcrumb span { color: var(--hara-muted); }
+.gallery-breadcrumb strong { color: var(--hara-text); font-weight: 650; }
+.gallery-breadcrumb i { color: var(--hara-faint); }
+
+.gallery-toolbar select,
+.toolbar-button {
+  min-height: 34px;
+  padding: .38rem .62rem;
+  border-color: var(--hara-line);
+  border-radius: var(--hara-radius-sm);
+  background: var(--hara-surface-solid);
+  color: var(--hara-muted);
+  font-size: .67rem;
+  font-weight: 620;
+}
+
+.gallery-toolbar select:hover,
+.toolbar-button:hover {
+  border-color: var(--hara-line-strong);
+  color: var(--hara-text);
+  background: var(--hara-surface-raised);
+}
+
+.toolbar-button.primary {
+  color: #fff;
+  border-color: var(--hara-signal);
+  background: var(--hara-signal);
+}
+
+.toolbar-button.primary:hover {
+  color: #fff;
+  border-color: color-mix(in srgb, var(--hara-signal) 80%, black);
+  background: color-mix(in srgb, var(--hara-signal) 88%, black);
+}
+
+.gallery-tabs {
+  gap: 0;
+  border-bottom-color: var(--hara-line);
+  background: color-mix(in srgb, var(--hara-surface-solid) 82%, var(--hara-bg));
+}
+
+.gallery-tabs button {
+  color: var(--hara-faint);
+  font-family: var(--hara-font-sans);
+  font-size: .72rem;
+  font-weight: 620;
+}
+
+.gallery-tabs button:hover,
+.gallery-tabs button[aria-selected="true"] { color: var(--hara-text); }
+.gallery-tabs button[aria-selected="true"]::after { background: var(--hara-signal); box-shadow: none; }
+
+.gallery-canvas-scroll {
+  background-color: var(--hara-bg);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--hara-bg) 86%, transparent), color-mix(in srgb, var(--hara-bg) 90%, transparent)),
+    url("./vendor/visual-language/backgrounds/ast-field.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.gallery-viewport {
+  border-color: var(--hara-line-strong);
+  border-radius: var(--hara-radius-md);
+  background: var(--hara-surface-solid);
+  box-shadow: var(--hara-shadow);
+}
+
+.gallery-viewport iframe { background: var(--hara-bg-clean); }
+
+.gallery-frame-status {
+  color: var(--hara-muted);
+  background: color-mix(in srgb, var(--hara-surface-solid) 94%, transparent);
+  font-family: var(--hara-font-sans);
+}
+
+.gallery-frame-status i {
+  width: 7px;
+  height: 7px;
+  border-radius: 1px;
+  background: var(--hara-signal);
+  box-shadow: none;
+}
+
+.gallery-resource-panel { background: var(--hara-bg); }
+
+.gallery-resource-panel h2,
+.gallery-empty h2,
+.gallery-failure h2,
+.gallery-details h2 {
+  font-family: var(--hara-font-sans);
+  font-weight: 700;
+}
+
+.gallery-resource-panel header a,
+.gallery-exact-links a { color: var(--hara-signal); }
+.panel-summary { color: var(--hara-muted); }
+
+.gallery-resource-panel pre {
+  border-color: var(--hara-line);
+  border-radius: var(--hara-radius-sm);
+  background: var(--hara-surface-solid);
+  box-shadow: inset 0 1px color-mix(in srgb, var(--hara-text) 4%, transparent);
+}
+
+.docs-panel pre,
+.docs-panel code { font-family: var(--hara-font-sans); }
+
+.gallery-empty,
+.gallery-failure { padding: clamp(1.5rem, 5vw, 4rem); }
+.gallery-empty > p:not(.eyebrow),
+.gallery-failure > p:not(.eyebrow) { color: var(--hara-muted); font-size: .9rem; line-height: 1.65; }
+
+.gallery-statusbar {
+  color: var(--hara-faint);
+  border-top-color: var(--hara-line);
+  background: var(--hara-surface-solid);
+}
+
+.gallery-details { padding: 1.45rem 1.2rem; }
+.gallery-details header > p:last-child { color: var(--hara-muted); line-height: 1.6; }
+.gallery-facts > div { border-bottom-color: var(--hara-line); }
+.gallery-facts dt { color: var(--hara-faint); font-family: var(--hara-font-sans); text-transform: uppercase; letter-spacing: .05em; }
+.gallery-facts dd { color: var(--hara-muted); }
+.gallery-facts code { color: var(--hara-signal); }
+
+.gallery-tag {
+  border-color: var(--hara-line);
+  border-radius: 4px;
+  color: var(--hara-muted);
+  background: var(--hara-surface-raised);
+}
+
+.authority-note { border-top-color: var(--hara-line); color: var(--hara-faint); }
+
+.gallery-page.sidebar-open::before {
+  top: var(--gallery-header);
+  background: rgba(0, 0, 0, .45);
+}
+
+@media (max-width: 1180px) {
+  :root { --gallery-details: 278px; --gallery-sidebar: 260px; }
+}
+
+@media (max-width: 980px) {
+  .gallery-page { grid-template-columns: var(--gallery-sidebar) minmax(0, 1fr); }
+  .gallery-details { display: none; }
+}
+
+@media (max-width: 760px) {
+  .gallery-page { grid-template-columns: minmax(0, 1fr); }
+  .gallery-sidebar {
+    position: fixed;
+    top: var(--gallery-header);
+    bottom: 0;
+    left: 0;
+    z-index: 50;
+    width: min(86vw, 320px);
+    transform: translateX(-102%);
+    transition: transform var(--hara-motion-fast) ease;
+    background: var(--hara-surface-solid);
+    box-shadow: 20px 0 70px rgba(0, 0, 0, .28);
+  }
+  .gallery-page.sidebar-open .gallery-sidebar { transform: translateX(0); }
+  .gallery-page.sidebar-open::before { inset: var(--gallery-header) 0 0; }
+}
+
+@media (max-width: 480px) {
+  .gallery-canvas-scroll {
+    background-image: none;
+    background-color: var(--hara-bg-clean);
+  }
+
+  .gallery-viewport { border-radius: 0; box-shadow: none; }
+}
