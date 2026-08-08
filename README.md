@@ -26,45 +26,61 @@ intent, registry validation, and review.
 - `packages/<owner>/<name>/<version>.edn` — immutable finalized releases.
 - `packages/<owner>/<name>/<version>.showcase.edn` — optional reviewed views,
   named states and runnable demos for that exact release.
-- `requests/` — publication requests awaiting review.
-- `src/` — strict EDN, Showcase validation, immutable publication preflight and
-  Gallery indexing.
+- `requests/<owner>/<name>/<version>.edn` — signed publication requests.
+- `requests/candidates/index.json` — deterministic, explicitly unverified
+  candidate projection used during review.
+- `src/` — strict EDN, publication, Showcase, immutable preflight and Gallery
+  validation.
 - `site/` — generated/static package browser deployed through Netlify.
 
 ## Package Showcases
 
-A finalized package may publish a closed declarative Showcase sidecar. It names
-views, bounded EDN states and complete commit-pinned demo projects. The Gallery
-runs demos through the cross-origin Playground Showcase Host; the Packages
-origin never executes package code.
+A source package may keep a closed declarative `showcase.edn` beside its
+`project.edn`. The source-local file names views, bounded EDN states and complete
+Playground demo projects, but deliberately omits `:showcase/source`: a file
+cannot contain the hash of the same Git commit that contains the file.
+
+A publication request supplies the exact repository, commit and package root.
+Registry candidate preparation fetches `showcase.edn` from that commit, injects
+the immutable source identity, validates the finalized form and preflights every
+referenced path and Workspace surface.
 
 ```text
-reviewed release + Showcase sidecar
-    -> immutable source-tree preflight
+source package/showcase.edn
+    + signed publication request
+    -> immutable source identity injection
+    -> finalized Showcase validation
+    -> source-tree and Workspace preflight
+    -> reviewed release + Showcase sidecar
     -> generated site/gallery.json
-    -> packages.hara-lang.org navigation
-    -> commit-pinned playground.hara-lang.org iframe
-    -> Hara runtime + Hodos view
+    -> packages.hara-lang.org
+    -> commit-pinned Playground iframe
 ```
 
-`npm run showcase:preflight` verifies every declared source, docs, state and
-demo path at the exact source commit. It also requires complete demo projects,
-parses state fixtures as data-only EDN and proves that each selected surface is
-available in the project's `workspace.edn`. Branches are descriptive only and
-are never resolved during publication preflight.
+The Packages origin never executes package code. Runnable demos remain complete
+projects hosted by the capability-gated Playground Showcase Host.
+
+`npm run showcase:preflight` verifies finalized Showcases already present in the
+registry. `npm run requests:build` materializes deterministic publication
+candidates from pending requests, and `npm run requests:check` prevents the
+committed candidate index from drifting.
 
 Showcase metadata cannot contain source snippets, expressions, constructors or
 capability grants. Packages without a Showcase remain valid and installable.
-See [`docs/showcase-format.md`](docs/showcase-format.md).
+See [`docs/showcase-format.md`](docs/showcase-format.md) and
+[`docs/publication-requests.md`](docs/publication-requests.md).
 
 ## Publication lifecycle
 
-1. A source tag produces a signed publisher intent.
-2. A reviewed request identifies that immutable source commit.
-3. Registry CI rebuilds the package, verifies the intent, validates the optional
-   `showcase.edn`, and preflights all referenced files and surfaces against that
-   exact commit.
-4. A protected publishing job signs the registry attestation and uploads the
-   archive and detached metadata to the source release.
-5. The final release record and optional normalized Showcase sidecar are
-   committed here and appear in the site index.
+1. A source tag produces a signed publisher intent, archive digest and optional
+   package-local `showcase.edn`.
+2. A request identifies the immutable source commit, package root, archive,
+   exported namespaces and publisher evidence.
+3. Registry CI materializes an explicitly unverified candidate, validates the
+   optional Showcase and preflights all referenced files, projects and surfaces
+   against that exact commit.
+4. Review and protected jobs verify the namespace grant, publisher signatures,
+   reproducible archive checksum and release upload.
+5. A registry signer creates the final attestation. Only then are the immutable
+   release record and optional normalized Showcase sidecar committed and exposed
+   through the Gallery.

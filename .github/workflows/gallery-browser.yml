@@ -5,10 +5,12 @@ on:
     paths:
       - ".github/workflows/gallery-browser.yml"
       - "packages/**"
+      - "requests/**"
       - "src/**"
       - "scripts/**"
       - "site/**"
       - "test/gallery-ui.test.mjs"
+      - "test/publication*.test.mjs"
       - "test/showcase*.test.mjs"
       - "package.json"
   push:
@@ -16,10 +18,12 @@ on:
     paths:
       - ".github/workflows/gallery-browser.yml"
       - "packages/**"
+      - "requests/**"
       - "src/**"
       - "scripts/**"
       - "site/**"
       - "test/gallery-ui.test.mjs"
+      - "test/publication*.test.mjs"
       - "test/showcase*.test.mjs"
       - "package.json"
   workflow_dispatch:
@@ -38,7 +42,7 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Validate registry, Showcase and Gallery contracts
+      - name: Validate publication, Showcase and Gallery contracts
         run: npm run validate
         env:
           GITHUB_TOKEN: ${{ github.token }}

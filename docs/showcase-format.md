@@ -13,7 +13,7 @@ closed declarative index of the package's visible views, named states and
 runnable demos. Registry validation rejects executable forms, hidden fields,
 path traversal, broken references and mutable source identities.
 
-## Example
+## Finalized registry example
 
 ```clojure
 {:hara/type :showcase
@@ -27,14 +27,14 @@ path traversal, broken references and mutable source identities.
  {:source/repository "hara-lang/example"
   :source/branch "main"
   :source/commit "0123456789abcdef0123456789abcdef01234567"
-  :source/root "examples"}
+  :source/root "packages/example"}
 
  :showcase/views
  [{:view/id :card
    :view/title "Card"
    :view/summary "The package card surface."
    :view/source "src/example/card.hal"
-   :view/docs "docs/card.md"}]
+   :view/docs "README.md"}]
 
  :showcase/states
  [{:state/id :default
@@ -56,6 +56,52 @@ path traversal, broken references and mutable source identities.
                    :viewport/height 480}
    :demo/default true}]}
 ```
+
+## Package-local authoring form
+
+A package repository may keep `showcase.edn` beside its `project.edn`. This
+source-local form uses the same fields except `:showcase/source`:
+
+```clojure
+{:hara/type :showcase
+ :showcase/format 1
+ :showcase/package :hara/example
+ :showcase/version "0.1.0"
+ :showcase/title "Example UI"
+ :showcase/views [...]
+ :showcase/states [...]
+ :showcase/demos [...]}
+```
+
+The omission is required rather than optional. Git commits are
+content-addressed, so a file cannot contain the hash of the same commit that
+contains it. A signed publication request supplies the exact repository,
+commit, branch and package root. Candidate preparation injects those values and
+then runs the normal finalized schema and immutable source preflight.
+
+The source-local manifest cannot provide or override `:showcase/source`. This
+keeps mutable branches and package-authored commit claims out of the authority
+path.
+
+Paths inside views, states and demos are relative to the publication request's
+`:source/root`. A common package layout is:
+
+```text
+project.edn
+README.md
+showcase.edn
+src/...
+showcase/
+  states/default.edn
+  card-default/
+    project.edn
+    workspace.edn
+    README.md
+    src/main.hal
+```
+
+See [`publication-requests.md`](publication-requests.md) for materialization and
+candidate review.
 
 ## Model
 
@@ -84,18 +130,19 @@ capability grants or arbitrary commands. EDN lists, quoted forms and symbols
 are rejected before schema validation.
 
 All paths are normalized repository-relative paths. Absolute paths,
-backslashes, empty segments, `.` and `..` are rejected. Source commits must be
-lowercase 40-character Git SHAs.
+backslashes, empty segments, `.` and `..` are rejected. Finalized source commits
+must be lowercase 40-character Git SHAs.
 
 ## Publication preflight
 
 `npm run showcase:preflight` verifies finalized sidecars against their exact
-source commits before validation or deployment succeeds. It performs one
-recursive Git tree request per distinct repository and commit, never resolves a
-branch, and fails closed when the source tree is missing, malformed or
-truncated.
+source commits before validation or deployment succeeds. Publication candidate
+preparation performs the same preflight immediately after materializing a
+source-local manifest.
 
-The preflight proves that:
+The preflight performs one recursive Git tree request per distinct repository
+and commit, never resolves a branch, and fails closed when the source tree is
+missing, malformed or truncated. It proves that:
 
 - every declared view source and documentation file exists;
 - every named state file exists, uses `.edn`, stays within the bounded data

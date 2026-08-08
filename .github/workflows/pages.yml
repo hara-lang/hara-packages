@@ -3,7 +3,7 @@ name: Deploy packages.hara-lang.org
 on:
   push:
     branches: [main, production]
-    paths: [site/**, packages/**, registry.edn, src/**, scripts/**, netlify/**, netlify.toml, test/**, package.json, .github/scripts/**, .github/workflows/pages.yml]
+    paths: [site/**, packages/**, requests/**, registry.edn, src/**, scripts/**, netlify/**, netlify.toml, test/**, package.json, .github/scripts/**, .github/workflows/pages.yml]
   pull_request:
     branches: [main, production]
     types: [closed]
@@ -28,14 +28,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Build publication candidate projection
+        run: npm run requests:build
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Preflight published package Showcases
         run: npm run showcase:preflight
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Build package Gallery index
         run: npm run gallery:build
-      - name: Test functions and Gallery contracts
-        run: npm test
+      - name: Validate publication, Showcase and Gallery contracts
+        run: npm run validate
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Verify built shared identity shell
         run: |
           grep -Fq 'data-hara-identity' site/index.html
