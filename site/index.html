@@ -3,94 +3,239 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="The reviewed package registry for Hara.">
+    <meta name="description" content="Explore reviewed Hara packages, demos, named states and views.">
+    <meta name="hara-identity-mode" content="popup">
+    <meta name="theme-color" content="#080a0d">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Hara Packages">
-    <meta property="og:title" content="Hara Packages — reviewed packages">
-    <meta property="og:description" content="The reviewed package registry for Hara.">
+    <meta property="og:title" content="Hara Packages — demos, states and source">
+    <meta property="og:description" content="Explore reviewed Hara packages, demos, named states and views.">
     <meta property="og:url" content="https://packages.hara-lang.org/">
     <meta property="og:image" content="https://packages.hara-lang.org/og-hara-packages.jpg">
     <meta property="og:image:secure_url" content="https://packages.hara-lang.org/og-hara-packages.jpg">
     <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:width" content="3840">
     <meta property="og:image:height" content="2016">
-    <meta property="og:image:alt" content="Hara Packages — the reviewed registry for Hara">
+    <meta property="og:image:alt" content="Hara Packages — reviewed package demos and source">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Hara Packages — reviewed packages">
-    <meta name="twitter:description" content="The reviewed package registry for Hara.">
+    <meta name="twitter:title" content="Hara Packages — demos, states and source">
+    <meta name="twitter:description" content="Explore reviewed Hara packages, demos, named states and views.">
     <meta name="twitter:image" content="https://packages.hara-lang.org/og-hara-packages.jpg">
-    <meta name="twitter:image:alt" content="Hara Packages — the reviewed registry for Hara">
+    <meta name="twitter:image:alt" content="Hara Packages — reviewed package demos and source">
     <link rel="canonical" href="https://packages.hara-lang.org/">
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
-    <link rel="stylesheet" href="./vendor/hara-ui/tokens.css">
+    <link rel="icon" type="image/svg+xml" href="./vendor/visual-language/hara-logo.svg">
+    <link rel="stylesheet" href="./vendor/visual-language/theme.css">
     <link rel="stylesheet" href="./page.css">
+    <link rel="stylesheet" href="./public-shell.css">
+    <link rel="stylesheet" href="./visual-refresh.css">
     <title>Hara Packages</title>
   </head>
   <body>
     <header class="site-header">
       <a class="brand" href="https://www.hara-lang.org/" aria-label="Hara home">
-        <span class="brand-mark" aria-hidden="true">H</span>
-        <span>Hara</span>
+        <svg class="brand-logo" width="27" height="27" viewBox="0 0 64 64" aria-hidden="true">
+          <path fill="currentColor" d="M10 8h13v18h18V8h13v48H41V38H23v18H10z"></path>
+          <path fill="var(--hara-signal)" d="M27 8h10v10H27z"></path>
+        </svg>
+        <span class="brand-name">Hara</span>
+        <span class="brand-product">Packages</span>
       </a>
-      <nav aria-label="Hara ecosystem">
-        <a href="https://www.hara-lang.org/">Home</a>
+      <nav aria-label="Primary">
+        <a href="https://www.hara-lang.org/benchmarks/">Benchmarks</a>
+        <a href="https://www.hara-lang.org/docs/start/orientation/">Docs</a>
         <a href="https://specs.hara-lang.org/">Specs</a>
-        <span aria-current="page">Packages</span>
-        <a href="https://id.hara-lang.org/">Identity</a>
+        <a href="https://world.hara-lang.org/">World</a>
       </nav>
-      <div data-hara-identity></div>
+      <div class="header-actions">
+        <div data-hara-identity>
+          <a class="sign-in" data-hara-identity-fallback href="https://id.hara-lang.org/" aria-label="Sign in with GitHub">Sign in</a>
+        </div>
+        <button class="hara-theme-toggle" type="button" data-hara-theme-toggle aria-label="Change colour theme">
+          <span aria-hidden="true" data-hara-theme-icon>◐</span>
+          <span data-hara-theme-label>System</span>
+        </button>
+      </div>
     </header>
 
-    <main class="page">
-      <header class="hero">
-        <p class="eyebrow">HARA / PACKAGES</p>
-        <h1>The reviewed package registry.</h1>
-        <p class="lede">
-          The registry of record lives in Git; this origin serves it read-only.
-          Package objects are digest-addressed, so what you install is exactly
-          what was reviewed.
-        </p>
-      </header>
+    <main class="gallery-page" data-gallery-app data-gallery-status="loading">
+      <aside class="gallery-sidebar" aria-label="Package stories">
+        <header class="gallery-sidebar-header">
+          <p class="eyebrow">HARA / PACKAGE GALLERY</p>
+          <div class="gallery-sidebar-title">
+            <h1>Reviewed packages</h1>
+            <span data-gallery-count aria-live="polite">…</span>
+          </div>
+          <p>Named states, exact source and commit-pinned demonstrations beside every reviewed release.</p>
+        </header>
 
-      <section class="cards" aria-label="Registry endpoints">
-        <a class="card" href="/v1/registry">
-          <span class="card-path">/v1/registry</span>
-          <span class="card-note">The registry document, as EDN. Pinned to <code>main</code> or a commit.</span>
-        </a>
-        <a class="card" href="/.well-known/hara-tap.edn">
-          <span class="card-path">/.well-known/hara-tap.edn</span>
-          <span class="card-note">Tap discovery: name, identity, and registry coordinates.</span>
-        </a>
-        <a class="card" href="./index.json">
-          <span class="card-path">./index.json</span>
-          <span class="card-note">Machine-readable registry index.</span>
-        </a>
-        <a class="card" href="https://github.com/hara-lang/hara-packages">
-          <span class="card-path">hara-lang/hara-packages</span>
-          <span class="card-note">The Git repository of record. Review happens here.</span>
-        </a>
-        <a class="card" href="https://specs.hara-lang.org">
-          <span class="card-path">specs.hara-lang.org</span>
-          <span class="card-note">The normative Hara specifications.</span>
-        </a>
-      </section>
+        <label class="gallery-search">
+          <span class="sr-only">Search packages and demos</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m16 16 4 4"></path></svg>
+          <input type="search" data-gallery-search placeholder="Search packages and demos" autocomplete="off" spellcheck="false">
+          <kbd>/</kbd>
+        </label>
 
-      <section class="usage" aria-label="Usage">
-        <pre><code>$ hara tap list
-hara    https://packages.hara-lang.org
+        <div class="gallery-tree" data-gallery-tree role="tree" aria-label="Published package demos"></div>
 
-$ hara package install hara/std.http</code></pre>
-      </section>
-
-      <footer class="foot">
-        <p>Hara Packages — read-only origin for the reviewed registry.</p>
-        <nav>
-          <a href="https://opensource.greenways.ai/open-source/">A Greenways Open Source Project</a>
-          <a href="https://github.com/hara-lang/hara-packages/blob/main/LICENSE">Apache-2.0</a>
+        <nav class="gallery-registry-links" aria-label="Registry resources">
+          <a href="/v1/registry">Registry EDN</a>
+          <a href="./index.json">Package index</a>
+          <a href="./gallery.json">Gallery index</a>
+          <a href="https://github.com/hara-lang/hara-packages">Review on GitHub</a>
         </nav>
-      </footer>
+      </aside>
+
+      <section class="gallery-workbench" aria-label="Package demo workbench">
+        <header class="gallery-toolbar">
+          <button class="icon-button sidebar-toggle" type="button" data-gallery-sidebar-toggle aria-label="Toggle package stories" aria-expanded="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16"></path></svg>
+          </button>
+          <div class="gallery-breadcrumb" aria-live="polite">
+            <span data-gallery-package>Hara Packages</span>
+            <i aria-hidden="true">/</i>
+            <span data-gallery-version>Gallery</span>
+            <i aria-hidden="true">/</i>
+            <strong data-gallery-demo>Loading</strong>
+          </div>
+          <div class="gallery-toolbar-controls">
+            <label>
+              <span class="sr-only">Surface</span>
+              <select data-gallery-surface aria-label="Showcase surface" disabled>
+                <option value="">Surface</option>
+              </select>
+            </label>
+            <label>
+              <span class="sr-only">Theme</span>
+              <select data-gallery-theme aria-label="Demo theme">
+                <option value="demo">Theme: demo</option>
+                <option value="dark">Theme: dark</option>
+                <option value="light">Theme: light</option>
+              </select>
+            </label>
+            <label>
+              <span class="sr-only">Viewport</span>
+              <select data-gallery-viewport aria-label="Demo viewport">
+                <option value="responsive">Responsive</option>
+                <option value="demo">Demo size</option>
+                <option value="mobile">Mobile · 390 × 844</option>
+                <option value="tablet">Tablet · 768 × 1024</option>
+                <option value="desktop">Desktop · 1440 × 900</option>
+              </select>
+            </label>
+            <button class="toolbar-button" type="button" data-gallery-copy-link>Copy link</button>
+            <a class="toolbar-button primary" data-gallery-open-playground href="https://playground.hara-lang.org/" target="_blank" rel="noreferrer">Open Playground</a>
+          </div>
+        </header>
+
+        <nav class="gallery-tabs" role="tablist" aria-label="Package demo panels">
+          <button type="button" role="tab" data-gallery-tab="canvas" aria-selected="true">Canvas</button>
+          <button type="button" role="tab" data-gallery-tab="state" aria-selected="false">State</button>
+          <button type="button" role="tab" data-gallery-tab="source" aria-selected="false">Source</button>
+          <button type="button" role="tab" data-gallery-tab="docs" aria-selected="false">Docs</button>
+        </nav>
+
+        <div class="gallery-stage">
+          <section class="gallery-canvas-panel" data-gallery-panel="canvas" role="tabpanel">
+            <div class="gallery-canvas-scroll">
+              <div class="gallery-viewport" data-gallery-frame-shell data-viewport="responsive">
+                <iframe
+                  data-gallery-frame
+                  title="Hara package demo"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-downloads allow-pointer-lock"
+                  allow="clipboard-write; fullscreen"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                ></iframe>
+                <div class="gallery-frame-status" data-gallery-frame-status data-status="loading" role="status" aria-live="polite">
+                  <i aria-hidden="true"></i>
+                  <span>Opening immutable package demo…</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="gallery-resource-panel" data-gallery-panel="state" role="tabpanel" hidden>
+            <header>
+              <div><p class="panel-kicker">NAMED STATE</p><h2 data-gallery-state-title>No state selected</h2></div>
+              <a data-gallery-state-link href="#" target="_blank" rel="noreferrer" hidden>Open fixture</a>
+            </header>
+            <p class="panel-summary" data-gallery-state-summary></p>
+            <pre data-gallery-state-content><code>Select a demo with a named state.</code></pre>
+          </section>
+
+          <section class="gallery-resource-panel" data-gallery-panel="source" role="tabpanel" hidden>
+            <header>
+              <div><p class="panel-kicker">EXACT SOURCE</p><h2 data-gallery-source-title>No source selected</h2></div>
+              <a data-gallery-source-link href="#" target="_blank" rel="noreferrer" hidden>Open on GitHub</a>
+            </header>
+            <p class="panel-summary" data-gallery-source-summary></p>
+            <pre data-gallery-source-content><code>Select a published view with a source path.</code></pre>
+          </section>
+
+          <section class="gallery-resource-panel docs-panel" data-gallery-panel="docs" role="tabpanel" hidden>
+            <header>
+              <div><p class="panel-kicker">PACKAGE NOTES</p><h2 data-gallery-docs-title>No documentation selected</h2></div>
+              <a data-gallery-docs-link href="#" target="_blank" rel="noreferrer" hidden>Open on GitHub</a>
+            </header>
+            <p class="panel-summary" data-gallery-docs-summary></p>
+            <pre data-gallery-docs-content><code>Select a demo with published documentation.</code></pre>
+          </section>
+
+          <section class="gallery-empty" data-gallery-empty hidden>
+            <p class="eyebrow">PACKAGE SHOWCASES</p>
+            <h2>Publish the demo beside the code.</h2>
+            <p>
+              Finalized Hara packages can now declare views, named states and complete
+              commit-pinned demo projects in <code>showcase.edn</code>. The Gallery will
+              render them here through the isolated Playground host.
+            </p>
+            <div class="empty-actions">
+              <a class="toolbar-button primary" href="https://github.com/hara-lang/hara-packages/blob/main/docs/showcase-format.md">Read the Showcase format</a>
+              <a class="toolbar-button" href="https://github.com/hara-lang/hara-packages">Publish through review</a>
+            </div>
+          </section>
+
+          <section class="gallery-failure" data-gallery-failure hidden role="alert">
+            <p class="eyebrow">GALLERY ERROR</p>
+            <h2>The reviewed Gallery index could not be opened.</h2>
+            <p data-gallery-failure-message></p>
+            <button class="toolbar-button" type="button" data-gallery-retry>Retry</button>
+          </section>
+        </div>
+
+        <footer class="gallery-statusbar">
+          <span data-gallery-runtime-status>Loading reviewed Gallery index</span>
+          <span data-gallery-commit></span>
+        </footer>
+      </section>
+
+      <aside class="gallery-details" aria-label="Selected demo details">
+        <header>
+          <p class="panel-kicker">SELECTED DEMO</p>
+          <h2 data-gallery-detail-title>Loading Gallery</h2>
+          <p data-gallery-detail-summary>Reading finalized package Showcases.</p>
+        </header>
+        <dl class="gallery-facts">
+          <div><dt>Package</dt><dd data-gallery-detail-package>—</dd></div>
+          <div><dt>Version</dt><dd data-gallery-detail-version>—</dd></div>
+          <div><dt>View</dt><dd data-gallery-detail-view>—</dd></div>
+          <div><dt>State</dt><dd data-gallery-detail-state>—</dd></div>
+          <div><dt>Surface</dt><dd data-gallery-detail-surface>—</dd></div>
+          <div><dt>Commit</dt><dd><code data-gallery-detail-commit>—</code></dd></div>
+        </dl>
+        <div class="gallery-tags" data-gallery-tags aria-label="Demo tags"></div>
+        <div class="gallery-exact-links">
+          <a data-gallery-repository-link href="https://github.com/hara-lang" target="_blank" rel="noreferrer">Exact repository commit</a>
+          <a data-gallery-showcase-link href="https://github.com/hara-lang/hara-packages" target="_blank" rel="noreferrer">Reviewed Showcase record</a>
+        </div>
+        <p class="authority-note">
+          Package metadata is rendered here. Package code executes only inside the
+          cross-origin, capability-gated Playground frame.
+        </p>
+      </aside>
     </main>
 
+    <script type="module" src="./theme-toggle.js"></script>
+    <script type="module" src="./gallery.js"></script>
     <script>
       (() => {
         const testing = location.hostname === "packages.testing.hara-lang.org"
@@ -98,8 +243,14 @@ $ hara package install hara/std.http</code></pre>
         const identityOrigin = testing
           ? "https://id.testing.hara-lang.org"
           : "https://id.hara-lang.org";
+        document.querySelectorAll("[data-hara-identity-fallback]").forEach((fallback) => {
+          if (!(fallback instanceof HTMLAnchorElement)) return;
+          const signIn = new URL("/github/start", identityOrigin);
+          signIn.searchParams.set("returnTo", location.href);
+          fallback.href = signIn.href;
+        });
         const script = document.createElement("script");
-        script.src = `${identityOrigin}/identity-client.js`;
+        script.src = `${identityOrigin}/v1/identity-client.js`;
         script.defer = true;
         script.dataset.haraIdentityClient = "";
         document.head.append(script);

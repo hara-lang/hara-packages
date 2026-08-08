@@ -1,0 +1,610 @@
+{
+  "format": 1,
+  "registry": "hara",
+  "packages": [
+    {
+      "id": "greenways/hodos-2d",
+      "versions": [
+        {
+          "format": 1,
+          "package": "greenways/hodos-2d",
+          "version": "0.1.0",
+          "title": "Hodos 2D models",
+          "summary": "Inspectable document and typed graph models published with the HAL-first package.",
+          "source": {
+            "repository": "greenways-ai/hodos",
+            "commit": "bc03cd3f1d566c94f961c47cce9cd4850a39be29",
+            "branch": "main",
+            "root": "packages/2d"
+          },
+          "views": [
+            {
+              "id": "document",
+              "title": "Document",
+              "summary": "Stable block, text and artefact identity with bounded editing events.",
+              "source": "src/gw/hodos/two_d/document.hal",
+              "docs": "README.md"
+            },
+            {
+              "id": "graph",
+              "title": "Graph",
+              "summary": "Typed nodes, ports and connections with semantic selection and movement.",
+              "source": "src/gw/hodos/two_d/graph.hal",
+              "docs": "README.md"
+            }
+          ],
+          "states": [
+            {
+              "id": "document/default",
+              "title": "Editable document",
+              "summary": "A document with stable text identity and one committed value artefact.",
+              "file": "showcase/states/document-default.edn"
+            },
+            {
+              "id": "graph/typed-flow",
+              "title": "Typed flow",
+              "summary": "A source, transform and result connected by number ports.",
+              "file": "showcase/states/graph-typed-flow.edn"
+            }
+          ],
+          "demos": [
+            {
+              "id": "document/default",
+              "title": "Inspectable document",
+              "summary": "Select and edit stable document text while the package model remains data.",
+              "view": "document",
+              "state": "document/default",
+              "project": "showcase/document",
+              "surface": "document",
+              "docs": "showcase/document/README.md",
+              "tags": [
+                "document",
+                "identity",
+                "artefact"
+              ],
+              "theme": "light",
+              "viewport": {
+                "width": 960,
+                "height": 680
+              },
+              "default": true,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2F2d%2Fshowcase%2Fdocument&presentation=showcase&surface=document&theme=light"
+            },
+            {
+              "id": "graph/typed-flow",
+              "title": "Typed flow graph",
+              "summary": "Select and move graph nodes connected by typed ports.",
+              "view": "graph",
+              "state": "graph/typed-flow",
+              "project": "showcase/graph",
+              "surface": "graph",
+              "docs": "showcase/graph/README.md",
+              "tags": [
+                "graph",
+                "typed-ports",
+                "selection"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1100,
+                "height": 720
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2F2d%2Fshowcase%2Fgraph&presentation=showcase&surface=graph&theme=dark"
+            }
+          ],
+          "registryPath": "packages/greenways/hodos-2d/0.1.0.showcase.edn"
+        }
+      ]
+    },
+    {
+      "id": "greenways/hodos-2d-ui",
+      "versions": [
+        {
+          "format": 1,
+          "package": "greenways/hodos-2d-ui",
+          "version": "0.1.0",
+          "title": "Hodos 2D UI hosts",
+          "summary": "Safe visible Document and Graph mechanics over declarative Workspace models.",
+          "source": {
+            "repository": "greenways-ai/hodos",
+            "commit": "bc03cd3f1d566c94f961c47cce9cd4850a39be29",
+            "branch": "main",
+            "root": "packages/2d-ui"
+          },
+          "views": [
+            {
+              "id": "document-host",
+              "title": "Document DOM host",
+              "summary": "Stable editable text, safe artefact slots, focus restoration and deterministic disposal.",
+              "source": "src/document-dom-host.js",
+              "docs": "README.md"
+            },
+            {
+              "id": "graph-host",
+              "title": "Graph DOM/SVG host",
+              "summary": "Typed SVG connections, stable nodes and bounded pointer gestures.",
+              "source": "src/graph-dom-host.js",
+              "docs": "README.md"
+            }
+          ],
+          "states": [
+            {
+              "id": "document-host/editable",
+              "title": "Editable document host",
+              "summary": "Selection and text editing are enabled; structural mutation remains disabled.",
+              "file": "showcase/states/document-host-editable.edn"
+            },
+            {
+              "id": "graph-host/selected",
+              "title": "Selected graph host",
+              "summary": "One stable node is selected and may be moved.",
+              "file": "showcase/states/graph-host-selected.edn"
+            }
+          ],
+          "demos": [
+            {
+              "id": "document-host/editable",
+              "title": "Safe editable document",
+              "summary": "The default DOM host projects a bounded document model without HTML injection.",
+              "view": "document-host",
+              "state": "document-host/editable",
+              "project": "showcase/document-host",
+              "surface": "document",
+              "docs": "showcase/document-host/README.md",
+              "tags": [
+                "dom",
+                "document",
+                "focus"
+              ],
+              "theme": "light",
+              "viewport": {
+                "width": 960,
+                "height": 680
+              },
+              "default": true,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2F2d-ui%2Fshowcase%2Fdocument-host&presentation=showcase&surface=document&theme=light"
+            },
+            {
+              "id": "graph-host/selected",
+              "title": "Safe typed graph",
+              "summary": "The SVG host keeps selection canonical and pointer drag transient.",
+              "view": "graph-host",
+              "state": "graph-host/selected",
+              "project": "showcase/graph-host",
+              "surface": "graph",
+              "docs": "showcase/graph-host/README.md",
+              "tags": [
+                "svg",
+                "graph",
+                "pointer"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1100,
+                "height": 720
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2F2d-ui%2Fshowcase%2Fgraph-host&presentation=showcase&surface=graph&theme=dark"
+            }
+          ],
+          "registryPath": "packages/greenways/hodos-2d-ui/0.1.0.showcase.edn"
+        }
+      ]
+    },
+    {
+      "id": "greenways/hodos-dev",
+      "versions": [
+        {
+          "format": 1,
+          "package": "greenways/hodos-dev",
+          "version": "0.1.0",
+          "title": "Hodos Dev models",
+          "summary": "Serializable Explorer, Editor, Preview and REPL Workspace areas with closed semantic-event contracts.",
+          "source": {
+            "repository": "greenways-ai/hodos",
+            "commit": "bc03cd3f1d566c94f961c47cce9cd4850a39be29",
+            "branch": "main",
+            "root": "packages/dev"
+          },
+          "views": [
+            {
+              "id": "explorer",
+              "title": "Explorer",
+              "summary": "Canonical workspace entries, selection, expansion, status and capabilities.",
+              "source": "src/gw/hodos/dev/explorer.hal",
+              "docs": "README.md"
+            },
+            {
+              "id": "editor",
+              "title": "Editor",
+              "summary": "Document source, selection, completion and structural-editing preferences.",
+              "source": "src/gw/hodos/dev/editor.hal",
+              "docs": "README.md"
+            },
+            {
+              "id": "preview",
+              "title": "Preview",
+              "summary": "A bounded render projection whose sandbox remains host policy.",
+              "source": "src/gw/hodos/dev/preview.hal",
+              "docs": "README.md"
+            },
+            {
+              "id": "repl",
+              "title": "REPL",
+              "summary": "Session identity, namespace, status, input and transcript entries.",
+              "source": "src/gw/hodos/dev/repl.hal",
+              "docs": "README.md"
+            }
+          ],
+          "states": [
+            {
+              "id": "explorer/project",
+              "title": "Project files",
+              "summary": "A selected Hara source file inside an expanded project tree.",
+              "file": "showcase/states/explorer-project.edn"
+            },
+            {
+              "id": "editor/live",
+              "title": "Live Hara document",
+              "summary": "A ready Hara document with a stable selection and editor preferences.",
+              "file": "showcase/states/editor-live.edn"
+            },
+            {
+              "id": "preview/ready",
+              "title": "Ready interface value",
+              "summary": "A dark preview projection backed by an ordinary Hara value.",
+              "file": "showcase/states/preview-ready.edn"
+            },
+            {
+              "id": "repl/ready",
+              "title": "Ready session",
+              "summary": "A Hara session with input and retained result entries.",
+              "file": "showcase/states/repl-ready.edn"
+            }
+          ],
+          "demos": [
+            {
+              "id": "explorer/project",
+              "title": "Explore a Hara project",
+              "summary": "Inspect the complete immutable story project through the live files surface.",
+              "view": "explorer",
+              "state": "explorer/project",
+              "project": "showcase/explorer",
+              "surface": "files",
+              "docs": "showcase/explorer/README.md",
+              "tags": [
+                "explorer",
+                "workspace",
+                "files"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1100,
+                "height": 720
+              },
+              "default": true,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2Fdev%2Fshowcase%2Fexplorer&presentation=showcase&surface=files&theme=dark"
+            },
+            {
+              "id": "editor/live",
+              "title": "Edit a Hara value",
+              "summary": "Open the package story source in the live Hodos editor surface.",
+              "view": "editor",
+              "state": "editor/live",
+              "project": "showcase/editor",
+              "surface": "code",
+              "docs": "showcase/editor/README.md",
+              "tags": [
+                "editor",
+                "hara",
+                "paredit"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1100,
+                "height": 720
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2Fdev%2Fshowcase%2Feditor&presentation=showcase&surface=code&theme=dark"
+            },
+            {
+              "id": "preview/ready",
+              "title": "Render an interface value",
+              "summary": "Evaluate an ordinary Hara value through the isolated preview surface.",
+              "view": "preview",
+              "state": "preview/ready",
+              "project": "showcase/preview",
+              "surface": "preview",
+              "docs": "showcase/preview/README.md",
+              "tags": [
+                "preview",
+                "hta",
+                "sandbox"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 900,
+                "height": 620
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2Fdev%2Fshowcase%2Fpreview&presentation=showcase&surface=preview&theme=dark"
+            },
+            {
+              "id": "repl/ready",
+              "title": "Use a Hara session",
+              "summary": "Inspect and extend a ready namespace through the live REPL surface.",
+              "view": "repl",
+              "state": "repl/ready",
+              "project": "showcase/repl",
+              "surface": "repl",
+              "docs": "showcase/repl/README.md",
+              "tags": [
+                "repl",
+                "session",
+                "values"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 900,
+                "height": 620
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2Fdev%2Fshowcase%2Frepl&presentation=showcase&surface=repl&theme=dark"
+            }
+          ],
+          "registryPath": "packages/greenways/hodos-dev/0.1.0.showcase.edn"
+        }
+      ]
+    },
+    {
+      "id": "greenways/hodos-dev-ui",
+      "versions": [
+        {
+          "format": 1,
+          "package": "greenways/hodos-dev-ui",
+          "version": "0.1.0",
+          "title": "Hodos Dev UI hosts",
+          "summary": "Trusted visible Explorer, Editor, Preview and REPL adapters driven by serializable Hodos Dev models.",
+          "source": {
+            "repository": "greenways-ai/hodos",
+            "commit": "bc03cd3f1d566c94f961c47cce9cd4850a39be29",
+            "branch": "main",
+            "root": "packages/dev-ui"
+          },
+          "views": [
+            {
+              "id": "explorer-host",
+              "title": "Explorer host",
+              "summary": "A visible workspace-entry host with deterministic model updates and disposal.",
+              "source": "src/index.js",
+              "docs": "README.md"
+            },
+            {
+              "id": "editor-host",
+              "title": "Editor host",
+              "summary": "A trusted editor adapter that keeps source authority with Hara and the product.",
+              "source": "src/index.js",
+              "docs": "README.md"
+            },
+            {
+              "id": "preview-host",
+              "title": "Preview host",
+              "summary": "An injected preview service behind the Hodos Workspace component contract.",
+              "source": "src/index.js",
+              "docs": "README.md"
+            },
+            {
+              "id": "repl-host",
+              "title": "REPL host",
+              "summary": "A visible session console emitting only declared semantic events.",
+              "source": "src/index.js",
+              "docs": "README.md"
+            }
+          ],
+          "states": [
+            {
+              "id": "explorer-host/project",
+              "title": "Explorer host lifecycle",
+              "file": "showcase/states/explorer-host.edn"
+            },
+            {
+              "id": "editor-host/live",
+              "title": "Editor host lifecycle",
+              "file": "showcase/states/editor-host.edn"
+            },
+            {
+              "id": "preview-host/ready",
+              "title": "Preview host lifecycle",
+              "file": "showcase/states/preview-host.edn"
+            },
+            {
+              "id": "repl-host/ready",
+              "title": "REPL host lifecycle",
+              "file": "showcase/states/repl-host.edn"
+            }
+          ],
+          "demos": [
+            {
+              "id": "explorer-host/project",
+              "title": "Visible project Explorer",
+              "summary": "Exercise the Playground's trusted Hodos Explorer integration on an immutable project.",
+              "view": "explorer-host",
+              "state": "explorer-host/project",
+              "project": "showcase/explorer-host",
+              "surface": "files",
+              "docs": "showcase/explorer-host/README.md",
+              "tags": [
+                "explorer",
+                "dom",
+                "lifecycle"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1100,
+                "height": 720
+              },
+              "default": true,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2Fdev-ui%2Fshowcase%2Fexplorer-host&presentation=showcase&surface=files&theme=dark"
+            },
+            {
+              "id": "editor-host/live",
+              "title": "Visible Hara editor",
+              "summary": "Exercise the trusted editor host with live source and semantic Workspace events.",
+              "view": "editor-host",
+              "state": "editor-host/live",
+              "project": "showcase/editor-host",
+              "surface": "code",
+              "docs": "showcase/editor-host/README.md",
+              "tags": [
+                "editor",
+                "dom",
+                "input"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1100,
+                "height": 720
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2Fdev-ui%2Fshowcase%2Feditor-host&presentation=showcase&surface=code&theme=dark"
+            },
+            {
+              "id": "preview-host/ready",
+              "title": "Isolated preview host",
+              "summary": "Render an ordinary Hara interface value through the injected preview service.",
+              "view": "preview-host",
+              "state": "preview-host/ready",
+              "project": "showcase/preview-host",
+              "surface": "preview",
+              "docs": "showcase/preview-host/README.md",
+              "tags": [
+                "preview",
+                "sandbox",
+                "host"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 900,
+                "height": 620
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2Fdev-ui%2Fshowcase%2Fpreview-host&presentation=showcase&surface=preview&theme=dark"
+            },
+            {
+              "id": "repl-host/ready",
+              "title": "Visible session console",
+              "summary": "Use the Playground's Hodos REPL host against a ready Hara namespace.",
+              "view": "repl-host",
+              "state": "repl-host/ready",
+              "project": "showcase/repl-host",
+              "surface": "repl",
+              "docs": "showcase/repl-host/README.md",
+              "tags": [
+                "repl",
+                "console",
+                "session"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 900,
+                "height": 620
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2Fdev-ui%2Fshowcase%2Frepl-host&presentation=showcase&surface=repl&theme=dark"
+            }
+          ],
+          "registryPath": "packages/greenways/hodos-dev-ui/0.1.0.showcase.edn"
+        }
+      ]
+    },
+    {
+      "id": "greenways/hodos-workspace-ui",
+      "versions": [
+        {
+          "format": 1,
+          "package": "greenways/hodos-workspace-ui",
+          "version": "0.1.0",
+          "title": "Hodos Workspace UI",
+          "summary": "Desktop and compact projections of one serializable Hara Workspace contract.",
+          "source": {
+            "repository": "greenways-ai/hodos",
+            "commit": "bc03cd3f1d566c94f961c47cce9cd4850a39be29",
+            "branch": "main",
+            "root": "packages/workspace-ui"
+          },
+          "views": [
+            {
+              "id": "workspace-shell",
+              "title": "Workspace shell",
+              "summary": "Recursive split layout, responsive surfaces, and deterministic area hosting.",
+              "source": "src/shell.js",
+              "docs": "README.md"
+            }
+          ],
+          "states": [
+            {
+              "id": "workspace/desktop",
+              "title": "Desktop split layout",
+              "summary": "Files, code, and preview are visible in a recursive horizontal layout.",
+              "file": "showcase/states/desktop.edn"
+            },
+            {
+              "id": "workspace/compact",
+              "title": "Compact surface",
+              "summary": "One selected surface is visible while the compact dock retains navigation.",
+              "file": "showcase/states/compact.edn"
+            }
+          ],
+          "demos": [
+            {
+              "id": "workspace/desktop",
+              "title": "Desktop Workspace shell",
+              "summary": "A semantic preview of recursive areas, split ratios, and application-owned state.",
+              "view": "workspace-shell",
+              "state": "workspace/desktop",
+              "project": "showcase/desktop-shell",
+              "surface": "preview",
+              "docs": "showcase/desktop-shell/README.md",
+              "tags": [
+                "workspace",
+                "layout",
+                "desktop"
+              ],
+              "theme": "light",
+              "viewport": {
+                "width": 1200,
+                "height": 760
+              },
+              "default": true,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2Fworkspace-ui%2Fshowcase%2Fdesktop-shell&presentation=showcase&surface=preview&theme=light"
+            },
+            {
+              "id": "workspace/compact",
+              "title": "Compact Workspace surface",
+              "summary": "A semantic preview of responsive surface selection and focus hand-off.",
+              "view": "workspace-shell",
+              "state": "workspace/compact",
+              "project": "showcase/compact-shell",
+              "surface": "preview",
+              "docs": "showcase/compact-shell/README.md",
+              "tags": [
+                "workspace",
+                "responsive",
+                "compact"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 430,
+                "height": 820
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2Fworkspace-ui%2Fshowcase%2Fcompact-shell&presentation=showcase&surface=preview&theme=dark"
+            }
+          ],
+          "registryPath": "packages/greenways/hodos-workspace-ui/0.1.0.showcase.edn"
+        }
+      ]
+    }
+  ]
+}
