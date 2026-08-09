@@ -1,0 +1,12 @@
+{:hara/type :package-release-preview
+ :release/format 1
+ :package/name :greenways/alumbra-history-store
+ :package/version "0.1.0"
+ :source/repository "greenways-ai/alumbra"
+ :source/branch "main"
+ :source/commit "236ecd0697ff3d0650e9dc10aeac3516637cd815"
+ :source/root "packages/history-store"
+ :registry/channel :testing
+ :registry/status :preview
+ :registry/note
+ "Unsigned testing Gallery preview. This record is not an installable or production Hara package release."}

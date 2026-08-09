@@ -1,0 +1,39 @@
+{:hara/type :showcase
+ :showcase/format 1
+ :showcase/package :greenways/alumbra-history
+ :showcase/version "0.1.0"
+ :showcase/title "History"
+ :showcase/summary
+ "Storage-neutral region checkpoints, ordered transaction replay, named restore and semantic-head-preserving compaction."
+ :showcase/source
+ {:source/repository "greenways-ai/alumbra"
+  :source/branch "main"
+  :source/commit "236ecd0697ff3d0650e9dc10aeac3516637cd815"
+  :source/root "packages/history"}
+
+ :showcase/views
+ [{:view/id :history-session
+   :view/title "History session"
+   :view/summary "Inspect one accepted world change, exact named restore and bounded compaction without selecting a storage provider."
+   :view/source "src/session.js"
+   :view/docs "README.md"}]
+
+ :showcase/states
+ [{:state/id :history/replay-restore-compact
+   :state/title "Replay, restore and compact"
+   :state/summary "Four region manifests, one contiguous transaction, one named restore and one semantic-head-preserving compaction proof."
+   :state/file "showcase/states/replay-restore-compact.edn"}]
+
+ :showcase/demos
+ [{:demo/id :replay-restore-compact
+   :demo/title "Replay, restore and compact world history"
+   :demo/summary "Follow a canonical world from base checkpoint through ordered replay, exact named restore and bounded compaction."
+   :demo/view :history-session
+   :demo/state :history/replay-restore-compact
+   :demo/project "showcase/replay-restore-compact"
+   :demo/surface :preview
+   :demo/docs "showcase/replay-restore-compact/README.md"
+   :demo/tags ["history" "checkpoint" "replay" "restore" "compaction" "level:foundation" "checks:7"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1180 :viewport/height 760}
+   :demo/default true}]}

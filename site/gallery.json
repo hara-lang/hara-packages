@@ -255,6 +255,134 @@
       ]
     },
     {
+      "id": "greenways/alumbra-history",
+      "versions": [
+        {
+          "format": 1,
+          "package": "greenways/alumbra-history",
+          "version": "0.1.0",
+          "title": "History",
+          "summary": "Storage-neutral region checkpoints, ordered transaction replay, named restore and semantic-head-preserving compaction.",
+          "source": {
+            "repository": "greenways-ai/alumbra",
+            "commit": "236ecd0697ff3d0650e9dc10aeac3516637cd815",
+            "branch": "main",
+            "root": "packages/history"
+          },
+          "views": [
+            {
+              "id": "history-session",
+              "title": "History session",
+              "summary": "Inspect one accepted world change, exact named restore and bounded compaction without selecting a storage provider.",
+              "source": "src/session.js",
+              "docs": "README.md"
+            }
+          ],
+          "states": [
+            {
+              "id": "history/replay-restore-compact",
+              "title": "Replay, restore and compact",
+              "summary": "Four region manifests, one contiguous transaction, one named restore and one semantic-head-preserving compaction proof.",
+              "file": "showcase/states/replay-restore-compact.edn"
+            }
+          ],
+          "demos": [
+            {
+              "id": "replay-restore-compact",
+              "title": "Replay, restore and compact world history",
+              "summary": "Follow a canonical world from base checkpoint through ordered replay, exact named restore and bounded compaction.",
+              "view": "history-session",
+              "state": "history/replay-restore-compact",
+              "project": "showcase/replay-restore-compact",
+              "surface": "preview",
+              "docs": "showcase/replay-restore-compact/README.md",
+              "tags": [
+                "history",
+                "checkpoint",
+                "replay",
+                "restore",
+                "compaction",
+                "level:foundation",
+                "checks:7"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1180,
+                "height": 760
+              },
+              "default": true,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Falumbra&branch=main&commit=236ecd0697ff3d0650e9dc10aeac3516637cd815&path=packages%2Fhistory%2Fshowcase%2Freplay-restore-compact&presentation=showcase&surface=preview&theme=dark"
+            }
+          ],
+          "registryPath": "packages/greenways/alumbra-history/0.1.0.showcase.edn"
+        }
+      ]
+    },
+    {
+      "id": "greenways/alumbra-history-store",
+      "versions": [
+        {
+          "format": 1,
+          "package": "greenways/alumbra-history-store",
+          "version": "0.1.0",
+          "title": "History Store",
+          "summary": "Content-addressed snapshot deduplication, deterministic archive identity, write-last manifest publication and verified loading.",
+          "source": {
+            "repository": "greenways-ai/alumbra",
+            "commit": "236ecd0697ff3d0650e9dc10aeac3516637cd815",
+            "branch": "main",
+            "root": "packages/history-store"
+          },
+          "views": [
+            {
+              "id": "content-addressed-archive",
+              "title": "Content-addressed archive",
+              "summary": "Inspect unique snapshot writes, deterministic reuse, verified named restore and fail-closed corruption boundaries.",
+              "source": "src/archive.js",
+              "docs": "README.md"
+            }
+          ],
+          "states": [
+            {
+              "id": "archive/deduplicate-publish-verify",
+              "title": "Deduplicate, publish last and verify",
+              "summary": "Three snapshot blobs are written once, the canonical manifest is published last and every load boundary verifies before returning world state.",
+              "file": "showcase/states/content-addressed-archive.edn"
+            }
+          ],
+          "demos": [
+            {
+              "id": "content-addressed-archive",
+              "title": "Save and verify a content-addressed history archive",
+              "summary": "Follow unique snapshot writes, deterministic reuse, write-last publication, exact replay and fail-closed corruption checks.",
+              "view": "content-addressed-archive",
+              "state": "archive/deduplicate-publish-verify",
+              "project": "showcase/content-addressed-archive",
+              "surface": "preview",
+              "docs": "showcase/content-addressed-archive/README.md",
+              "tags": [
+                "history",
+                "archive",
+                "content-addressed",
+                "deduplication",
+                "write-last",
+                "level:foundation",
+                "checks:8"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1180,
+                "height": 760
+              },
+              "default": true,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Falumbra&branch=main&commit=236ecd0697ff3d0650e9dc10aeac3516637cd815&path=packages%2Fhistory-store%2Fshowcase%2Fcontent-addressed-archive&presentation=showcase&surface=preview&theme=dark"
+            }
+          ],
+          "registryPath": "packages/greenways/alumbra-history-store/0.1.0.showcase.edn"
+        }
+      ]
+    },
+    {
       "id": "greenways/alumbra-hodos",
       "versions": [
         {

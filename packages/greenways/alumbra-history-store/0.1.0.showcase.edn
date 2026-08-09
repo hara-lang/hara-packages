@@ -1,0 +1,39 @@
+{:hara/type :showcase
+ :showcase/format 1
+ :showcase/package :greenways/alumbra-history-store
+ :showcase/version "0.1.0"
+ :showcase/title "History Store"
+ :showcase/summary
+ "Content-addressed snapshot deduplication, deterministic archive identity, write-last manifest publication and verified loading."
+ :showcase/source
+ {:source/repository "greenways-ai/alumbra"
+  :source/branch "main"
+  :source/commit "236ecd0697ff3d0650e9dc10aeac3516637cd815"
+  :source/root "packages/history-store"}
+
+ :showcase/views
+ [{:view/id :content-addressed-archive
+   :view/title "Content-addressed archive"
+   :view/summary "Inspect unique snapshot writes, deterministic reuse, verified named restore and fail-closed corruption boundaries."
+   :view/source "src/archive.js"
+   :view/docs "README.md"}]
+
+ :showcase/states
+ [{:state/id :archive/deduplicate-publish-verify
+   :state/title "Deduplicate, publish last and verify"
+   :state/summary "Three snapshot blobs are written once, the canonical manifest is published last and every load boundary verifies before returning world state."
+   :state/file "showcase/states/content-addressed-archive.edn"}]
+
+ :showcase/demos
+ [{:demo/id :content-addressed-archive
+   :demo/title "Save and verify a content-addressed history archive"
+   :demo/summary "Follow unique snapshot writes, deterministic reuse, write-last publication, exact replay and fail-closed corruption checks."
+   :demo/view :content-addressed-archive
+   :demo/state :archive/deduplicate-publish-verify
+   :demo/project "showcase/content-addressed-archive"
+   :demo/surface :preview
+   :demo/docs "showcase/content-addressed-archive/README.md"
+   :demo/tags ["history" "archive" "content-addressed" "deduplication" "write-last" "level:foundation" "checks:8"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1180 :viewport/height 760}
+   :demo/default true}]}
