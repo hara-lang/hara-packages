@@ -1,0 +1,36 @@
+{:hara/type :showcase
+ :showcase/format 1
+ :showcase/package :greenways/alumbra-hara
+ :showcase/version "0.1.0"
+ :showcase/title "Portable Rules"
+ :showcase/summary
+ "Packaged Hara world rules and render declarations projected without runtime authority."
+ :showcase/source
+ {:source/repository "greenways-ai/alumbra"
+  :source/branch "main"
+  :source/commit "e4745bd01d68c30e6c2502774285922f2adb1677"
+  :source/root "packages/hara"}
+
+ :showcase/views
+ [{:view/id :portable-rules
+   :view/title "Portable rules"
+   :view/summary "Resolve a pinned Hara generator identity into a deterministic height-field fixture."}]
+
+ :showcase/states
+ [{:state/id :world/default-seed
+   :state/title "Default seed"
+   :state/summary "A pinned package, generator and seed for the canonical height-field story."
+   :state/file "showcase/states/packaged-height-field.edn"}]
+
+ :showcase/demos
+ [{:demo/id :packaged-height-field
+   :demo/title "Packaged height field"
+   :demo/summary "Resolve a pinned Hara generator identity into a deterministic height-field fixture."
+   :demo/view :portable-rules
+   :demo/state :world/default-seed
+   :demo/project "showcase/packaged-height-field"
+   :demo/surface :preview
+   :demo/docs "showcase/packaged-height-field/README.md"
+   :demo/tags ["rules" "height-field" "level:foundation" "checks:4"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1180 :viewport/height 760}}]}
