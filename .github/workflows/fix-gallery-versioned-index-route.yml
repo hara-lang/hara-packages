@@ -1,0 +1,54 @@
+name: Fix versioned Gallery index browser fixture
+
+on:
+  push:
+    branches:
+      - agent/fix-packages-cloudflare-cache
+    paths:
+      - ".github/workflows/fix-gallery-versioned-index-route.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/fix-packages-cloudflare-cache
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Accept the versioned Gallery index URL in the empty-state fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PY'
+          from pathlib import Path
+
+          path = Path("scripts/verify-gallery-browser.mjs")
+          text = path.read_text()
+          old = 'await emptyPage.route("**/gallery.json", (route) => route.fulfill({'
+          new = 'await emptyPage.route("**/gallery.json*", (route) => route.fulfill({'
+          if old not in text:
+              raise SystemExit("The queryless Gallery route fixture was not found.")
+          path.write_text(text.replace(old, new, 1))
+          PY
+
+      - name: Validate service contracts
+        run: npm run validate
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Commit the fixture correction
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/verify-gallery-browser.mjs
+          git commit -m "Accept the versioned Gallery index browser fixture"
+          git push origin HEAD:agent/fix-packages-cloudflare-cache
