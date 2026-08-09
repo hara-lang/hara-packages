@@ -1,0 +1,56 @@
+{:hara/type :showcase
+ :showcase/format 1
+ :showcase/package :greenways/alumbra-engine
+ :showcase/version "0.1.0"
+ :showcase/title "Engine"
+ :showcase/summary
+ "Deterministic movement, collision and reach-safe world intents over canonical state."
+ :showcase/source
+ {:source/repository "greenways-ai/alumbra"
+  :source/branch "main"
+  :source/commit "e4745bd01d68c30e6c2502774285922f2adb1677"
+  :source/root "packages/engine"}
+
+ :showcase/views
+ [{:view/id :movement-loop
+   :view/title "Movement loop"
+   :view/summary "Project a deterministic player state through movement, collision and grounded jump boundaries."}
+  {:view/id :build-intents
+   :view/title "Build intents"
+   :view/summary "Inspect reach-safe break and place requests before they become conflict-checked Core transactions."
+   :view/source "src/build.js"
+   :view/docs "README.md"}]
+
+ :showcase/states
+ [{:state/id :player/grounded
+   :state/title "Grounded player"
+   :state/summary "A bounded player fixture ready for a deterministic movement step."
+   :state/file "showcase/states/walk-collide-jump.edn"}
+  {:state/id :build/place-and-undo
+   :state/title "Place intent with undo"
+   :state/summary "A face-adjacent placement, its reach and collision evidence, and the inverse transaction."
+   :state/file "showcase/states/build-intent-undo.edn"}]
+
+ :showcase/demos
+ [{:demo/id :walk-collide-jump
+   :demo/title "Walk, collide and jump"
+   :demo/summary "Project a deterministic player state through movement, collision and grounded jump boundaries."
+   :demo/view :movement-loop
+   :demo/state :player/grounded
+   :demo/project "showcase/walk-collide-jump"
+   :demo/surface :preview
+   :demo/docs "showcase/walk-collide-jump/README.md"
+   :demo/tags ["movement" "collision" "level:runtime" "checks:3"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1180 :viewport/height 760}}
+  {:demo/id :build-intent-undo
+   :demo/title "Place a block and inspect undo"
+   :demo/summary "Follow a reach-safe face-adjacent placement into a canonical transaction and explicit inverse."
+   :demo/view :build-intents
+   :demo/state :build/place-and-undo
+   :demo/project "showcase/build-intent-undo"
+   :demo/surface :preview
+   :demo/docs "showcase/build-intent-undo/README.md"
+   :demo/tags ["build" "reach" "collision" "undo" "level:runtime" "checks:4"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1180 :viewport/height 760}}]}

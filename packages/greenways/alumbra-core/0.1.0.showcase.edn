@@ -1,0 +1,56 @@
+{:hara/type :showcase
+ :showcase/format 1
+ :showcase/package :greenways/alumbra-core
+ :showcase/version "0.1.0"
+ :showcase/title "Core"
+ :showcase/summary
+ "Runtime-neutral block registries, palette-backed chunks and reversible transactions."
+ :showcase/source
+ {:source/repository "greenways-ai/alumbra"
+  :source/branch "main"
+  :source/commit "e4745bd01d68c30e6c2502774285922f2adb1677"
+  :source/root "packages/core"}
+
+ :showcase/views
+ [{:view/id :canonical-chunk
+   :view/title "Canonical chunk"
+   :view/summary "Inspect a bounded canonical chunk fixture whose palette and indices remain renderer-neutral."}
+  {:view/id :reversible-transaction
+   :view/title "Reversible transaction"
+   :view/summary "Follow one conflict-checked block change through revision evidence and an explicit inverse transaction."
+   :view/source "src/transaction.js"
+   :view/docs "README.md"}]
+
+ :showcase/states
+ [{:state/id :chunk/palette
+   :state/title "Palette-backed chunk"
+   :state/summary "A small canonical chunk state with stable block identities and revision evidence."
+   :state/file "showcase/states/palette-backed-chunk.edn"}
+  {:state/id :transaction/reversible
+   :state/title "Applied transaction and inverse"
+   :state/summary "A canonical block transaction, its applied revision receipt and the separately identified inverse."
+   :state/file "showcase/states/reversible-block-transaction.edn"}]
+
+ :showcase/demos
+ [{:demo/id :palette-backed-chunk
+   :demo/title "Palette-backed chunk"
+   :demo/summary "Inspect a bounded canonical chunk fixture whose palette and indices remain renderer-neutral."
+   :demo/view :canonical-chunk
+   :demo/state :chunk/palette
+   :demo/project "showcase/palette-backed-chunk"
+   :demo/surface :preview
+   :demo/docs "showcase/palette-backed-chunk/README.md"
+   :demo/tags ["chunk" "palette" "level:foundation" "checks:3"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1180 :viewport/height 760}}
+  {:demo/id :reversible-block-transaction
+   :demo/title "Apply and undo a block transaction"
+   :demo/summary "Inspect exact before/after block values, optimistic chunk revision evidence and the explicit inverse transaction."
+   :demo/view :reversible-transaction
+   :demo/state :transaction/reversible
+   :demo/project "showcase/reversible-block-transaction"
+   :demo/surface :preview
+   :demo/docs "showcase/reversible-block-transaction/README.md"
+   :demo/tags ["transaction" "undo" "conflict-check" "level:foundation" "checks:4"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1180 :viewport/height 760}}]}

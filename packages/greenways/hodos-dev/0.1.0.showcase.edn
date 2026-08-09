@@ -4,15 +4,20 @@
  :showcase/version "0.1.0"
  :showcase/title "Hodos Dev models"
  :showcase/summary
- "Serializable Explorer, Editor, Preview and REPL Workspace areas with closed semantic-event contracts."
+ "Serializable Catalog, Explorer, Editor, Preview, REPL, Problems, Value Inspector and Execution Workspace areas with closed semantic-event contracts."
  :showcase/source
  {:source/repository "greenways-ai/hodos"
   :source/branch "main"
-  :source/commit "bc03cd3f1d566c94f961c47cce9cd4850a39be29"
+  :source/commit "a9abd253d98afc7e257e8cf8bee67fbb916246f7"
   :source/root "packages/dev"}
 
  :showcase/views
- [{:view/id :explorer
+ [{:view/id :catalog
+   :view/title "Catalog"
+   :view/summary "Descriptive toolsets, activities, bounded check evidence and semantic learning requests."
+   :view/source "src/gw/hodos/dev/catalog.hal"
+   :view/docs "README.md"}
+  {:view/id :explorer
    :view/title "Explorer"
    :view/summary "Canonical workspace entries, selection, expansion, status and capabilities."
    :view/source "src/gw/hodos/dev/explorer.hal"
@@ -31,10 +36,29 @@
    :view/title "REPL"
    :view/summary "Session identity, namespace, status, input and transcript entries."
    :view/source "src/gw/hodos/dev/repl.hal"
+   :view/docs "README.md"}
+  {:view/id :problems
+   :view/title "Problems"
+   :view/summary "Structured diagnostics with source ranges, filters, counts and explicit source-navigation requests."
+   :view/source "src/gw/hodos/dev/problems.hal"
+   :view/docs "README.md"}
+  {:view/id :value-inspector
+   :view/title "Value Inspector"
+   :view/summary "Bounded serializable values, paths, expansion state and retained evaluation context."
+   :view/source "src/gw/hodos/dev/value_inspector.hal"
+   :view/docs "README.md"}
+  {:view/id :execution
+   :view/title "Execution"
+   :view/summary "Identity-safe metrics, compact events and bounded trace evidence without runtime ownership."
+   :view/source "src/gw/hodos/dev/execution.hal"
    :view/docs "README.md"}]
 
  :showcase/states
- [{:state/id :explorer/project
+ [{:state/id :catalog/activity
+   :state/title "Activity with check evidence"
+   :state/summary "Two descriptive toolsets, one selected activity and a bounded failed check result."
+   :state/file "showcase/states/catalog-activity.edn"}
+  {:state/id :explorer/project
    :state/title "Project files"
    :state/summary "A selected Hara source file inside an expanded project tree."
    :state/file "showcase/states/explorer-project.edn"}
@@ -49,10 +73,61 @@
   {:state/id :repl/ready
    :state/title "Ready session"
    :state/summary "A Hara session with input and retained result entries."
-   :state/file "showcase/states/repl-ready.edn"}]
+   :state/file "showcase/states/repl-ready.edn"}
+  {:state/id :problems/source
+   :state/title "Source-linked diagnostics"
+   :state/summary "A selected compiler error beside a retained runtime warning and active text filter."
+   :state/file "showcase/states/problems-source.edn"}
+  {:state/id :value/nested
+   :state/title "Nested retained value"
+   :state/summary "A selected path inside a bounded map value with stable expansion state."
+   :state/file "showcase/states/value-nested.edn"}
+  {:state/id :execution/idle
+   :state/title "Idle"
+   :state/summary "No live session and no retained evidence."
+   :state/file "showcase/states/execution-idle.edn"}
+  {:state/id :execution/running
+   :state/title "Running"
+   :state/summary "A bounded in-progress projection with Step, Run and Pause available."
+   :state/file "showcase/states/execution-running.edn"}
+  {:state/id :execution/paused
+   :state/title "Paused"
+   :state/summary "A source-linked boundary that can be stepped, run or resumed."
+   :state/file "showcase/states/execution-paused.edn"}
+  {:state/id :execution/suspended
+   :state/title "Suspended"
+   :state/summary "A promise boundary that requires explicit application settlement."
+   :state/file "showcase/states/execution-suspended.edn"}
+  {:state/id :execution/returned
+   :state/title "Returned 7"
+   :state/summary "Checked-in evidence for (+ 1 (* 2 3)) with terminal result 7."
+   :state/file "showcase/states/execution-returned.edn"}
+  {:state/id :execution/failed
+   :state/title "Failed"
+   :state/summary "A retained runtime failure with source-linked diagnostics."
+   :state/file "showcase/states/execution-failed.edn"}
+  {:state/id :execution/bounded
+   :state/title "Bounded evidence"
+   :state/summary "A retained tail with cumulative dropped and omitted counts."
+   :state/file "showcase/states/execution-bounded.edn"}
+  {:state/id :execution/compact
+   :state/title "Compact result"
+   :state/summary "A deliberately small retained projection for narrow viewports."
+   :state/file "showcase/states/execution-compact.edn"}]
 
  :showcase/demos
- [{:demo/id :explorer/project
+ [{:demo/id :catalog/activity
+   :demo/title "Browse a bounded activity Catalog"
+   :demo/summary "Inspect descriptive toolsets, a selected activity and retained check evidence through a closed Catalog model."
+   :demo/view :catalog
+   :demo/state :catalog/activity
+   :demo/project "showcase/catalog"
+   :demo/surface :catalog
+   :demo/docs "showcase/catalog/README.md"
+   :demo/tags ["catalog" "activities" "checks"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1100 :viewport/height 720}}
+  {:demo/id :explorer/project
    :demo/title "Explore a Hara project"
    :demo/summary "Inspect the complete immutable story project through the live files surface."
    :demo/view :explorer
@@ -96,4 +171,48 @@
    :demo/docs "showcase/repl/README.md"
    :demo/tags ["repl" "session" "values"]
    :demo/theme :dark
-   :demo/viewport {:viewport/width 900 :viewport/height 620}}]}
+   :demo/viewport {:viewport/width 900 :viewport/height 620}}
+  {:demo/id :problems/source
+   :demo/title "Inspect source-linked Problems"
+   :demo/summary "Filter structured diagnostics and inspect a selected compiler error without moving source authority into the component."
+   :demo/view :problems
+   :demo/state :problems/source
+   :demo/project "showcase/problems"
+   :demo/surface :problems
+   :demo/docs "showcase/problems/README.md"
+   :demo/tags ["problems" "diagnostics" "source-range"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1100 :viewport/height 720}}
+  {:demo/id :value/nested
+   :demo/title "Inspect a nested retained value"
+   :demo/summary "Navigate one selected path through bounded serializable data while retaining evaluation context."
+   :demo/view :value-inspector
+   :demo/state :value/nested
+   :demo/project "showcase/value-inspector"
+   :demo/surface :value
+   :demo/docs "showcase/value-inspector/README.md"
+   :demo/tags ["value" "inspection" "retained-result"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1000 :viewport/height 680}}
+  {:demo/id :execution/returned
+   :demo/title "Inspect a returned Hara execution"
+   :demo/summary "Explore immutable result-7 metrics, events and source-linked trace snapshots."
+   :demo/view :execution
+   :demo/state :execution/returned
+   :demo/project "showcase/execution"
+   :demo/surface :execution
+   :demo/docs "showcase/execution/README.md"
+   :demo/tags ["execution" "trace" "result-7"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1100 :viewport/height 720}}
+  {:demo/id :execution/compact
+   :demo/title "Inspect Execution in a compact viewport"
+   :demo/summary "Exercise the same inert Execution surface with bounded evidence at phone width."
+   :demo/view :execution
+   :demo/state :execution/compact
+   :demo/project "showcase/execution"
+   :demo/surface :execution
+   :demo/docs "showcase/execution/README.md"
+   :demo/tags ["execution" "compact" "responsive"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 520 :viewport/height 760}}]}

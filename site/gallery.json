@@ -3,6 +3,377 @@
   "registry": "hara",
   "packages": [
     {
+      "id": "greenways/alumbra-core",
+      "versions": [
+        {
+          "format": 1,
+          "package": "greenways/alumbra-core",
+          "version": "0.1.0",
+          "title": "Core",
+          "summary": "Runtime-neutral block registries, palette-backed chunks and reversible transactions.",
+          "source": {
+            "repository": "greenways-ai/alumbra",
+            "commit": "e4745bd01d68c30e6c2502774285922f2adb1677",
+            "branch": "main",
+            "root": "packages/core"
+          },
+          "views": [
+            {
+              "id": "canonical-chunk",
+              "title": "Canonical chunk",
+              "summary": "Inspect a bounded canonical chunk fixture whose palette and indices remain renderer-neutral."
+            },
+            {
+              "id": "reversible-transaction",
+              "title": "Reversible transaction",
+              "summary": "Follow one conflict-checked block change through revision evidence and an explicit inverse transaction.",
+              "source": "src/transaction.js",
+              "docs": "README.md"
+            }
+          ],
+          "states": [
+            {
+              "id": "chunk/palette",
+              "title": "Palette-backed chunk",
+              "summary": "A small canonical chunk state with stable block identities and revision evidence.",
+              "file": "showcase/states/palette-backed-chunk.edn"
+            },
+            {
+              "id": "transaction/reversible",
+              "title": "Applied transaction and inverse",
+              "summary": "A canonical block transaction, its applied revision receipt and the separately identified inverse.",
+              "file": "showcase/states/reversible-block-transaction.edn"
+            }
+          ],
+          "demos": [
+            {
+              "id": "palette-backed-chunk",
+              "title": "Palette-backed chunk",
+              "summary": "Inspect a bounded canonical chunk fixture whose palette and indices remain renderer-neutral.",
+              "view": "canonical-chunk",
+              "state": "chunk/palette",
+              "project": "showcase/palette-backed-chunk",
+              "surface": "preview",
+              "docs": "showcase/palette-backed-chunk/README.md",
+              "tags": [
+                "chunk",
+                "palette",
+                "level:foundation",
+                "checks:3"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1180,
+                "height": 760
+              },
+              "default": true,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Falumbra&branch=main&commit=e4745bd01d68c30e6c2502774285922f2adb1677&path=packages%2Fcore%2Fshowcase%2Fpalette-backed-chunk&presentation=showcase&surface=preview&theme=dark"
+            },
+            {
+              "id": "reversible-block-transaction",
+              "title": "Apply and undo a block transaction",
+              "summary": "Inspect exact before/after block values, optimistic chunk revision evidence and the explicit inverse transaction.",
+              "view": "reversible-transaction",
+              "state": "transaction/reversible",
+              "project": "showcase/reversible-block-transaction",
+              "surface": "preview",
+              "docs": "showcase/reversible-block-transaction/README.md",
+              "tags": [
+                "transaction",
+                "undo",
+                "conflict-check",
+                "level:foundation",
+                "checks:4"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1180,
+                "height": 760
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Falumbra&branch=main&commit=e4745bd01d68c30e6c2502774285922f2adb1677&path=packages%2Fcore%2Fshowcase%2Freversible-block-transaction&presentation=showcase&surface=preview&theme=dark"
+            }
+          ],
+          "registryPath": "packages/greenways/alumbra-core/0.1.0.showcase.edn"
+        }
+      ]
+    },
+    {
+      "id": "greenways/alumbra-engine",
+      "versions": [
+        {
+          "format": 1,
+          "package": "greenways/alumbra-engine",
+          "version": "0.1.0",
+          "title": "Engine",
+          "summary": "Deterministic movement, collision and reach-safe world intents over canonical state.",
+          "source": {
+            "repository": "greenways-ai/alumbra",
+            "commit": "e4745bd01d68c30e6c2502774285922f2adb1677",
+            "branch": "main",
+            "root": "packages/engine"
+          },
+          "views": [
+            {
+              "id": "movement-loop",
+              "title": "Movement loop",
+              "summary": "Project a deterministic player state through movement, collision and grounded jump boundaries."
+            },
+            {
+              "id": "build-intents",
+              "title": "Build intents",
+              "summary": "Inspect reach-safe break and place requests before they become conflict-checked Core transactions.",
+              "source": "src/build.js",
+              "docs": "README.md"
+            }
+          ],
+          "states": [
+            {
+              "id": "player/grounded",
+              "title": "Grounded player",
+              "summary": "A bounded player fixture ready for a deterministic movement step.",
+              "file": "showcase/states/walk-collide-jump.edn"
+            },
+            {
+              "id": "build/place-and-undo",
+              "title": "Place intent with undo",
+              "summary": "A face-adjacent placement, its reach and collision evidence, and the inverse transaction.",
+              "file": "showcase/states/build-intent-undo.edn"
+            }
+          ],
+          "demos": [
+            {
+              "id": "walk-collide-jump",
+              "title": "Walk, collide and jump",
+              "summary": "Project a deterministic player state through movement, collision and grounded jump boundaries.",
+              "view": "movement-loop",
+              "state": "player/grounded",
+              "project": "showcase/walk-collide-jump",
+              "surface": "preview",
+              "docs": "showcase/walk-collide-jump/README.md",
+              "tags": [
+                "movement",
+                "collision",
+                "level:runtime",
+                "checks:3"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1180,
+                "height": 760
+              },
+              "default": true,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Falumbra&branch=main&commit=e4745bd01d68c30e6c2502774285922f2adb1677&path=packages%2Fengine%2Fshowcase%2Fwalk-collide-jump&presentation=showcase&surface=preview&theme=dark"
+            },
+            {
+              "id": "build-intent-undo",
+              "title": "Place a block and inspect undo",
+              "summary": "Follow a reach-safe face-adjacent placement into a canonical transaction and explicit inverse.",
+              "view": "build-intents",
+              "state": "build/place-and-undo",
+              "project": "showcase/build-intent-undo",
+              "surface": "preview",
+              "docs": "showcase/build-intent-undo/README.md",
+              "tags": [
+                "build",
+                "reach",
+                "collision",
+                "undo",
+                "level:runtime",
+                "checks:4"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1180,
+                "height": 760
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Falumbra&branch=main&commit=e4745bd01d68c30e6c2502774285922f2adb1677&path=packages%2Fengine%2Fshowcase%2Fbuild-intent-undo&presentation=showcase&surface=preview&theme=dark"
+            }
+          ],
+          "registryPath": "packages/greenways/alumbra-engine/0.1.0.showcase.edn"
+        }
+      ]
+    },
+    {
+      "id": "greenways/alumbra-hara",
+      "versions": [
+        {
+          "format": 1,
+          "package": "greenways/alumbra-hara",
+          "version": "0.1.0",
+          "title": "Portable Rules",
+          "summary": "Packaged Hara world rules and render declarations projected without runtime authority.",
+          "source": {
+            "repository": "greenways-ai/alumbra",
+            "commit": "e4745bd01d68c30e6c2502774285922f2adb1677",
+            "branch": "main",
+            "root": "packages/hara"
+          },
+          "views": [
+            {
+              "id": "portable-rules",
+              "title": "Portable rules",
+              "summary": "Resolve a pinned Hara generator identity into a deterministic height-field fixture."
+            }
+          ],
+          "states": [
+            {
+              "id": "world/default-seed",
+              "title": "Default seed",
+              "summary": "A pinned package, generator and seed for the canonical height-field story.",
+              "file": "showcase/states/packaged-height-field.edn"
+            }
+          ],
+          "demos": [
+            {
+              "id": "packaged-height-field",
+              "title": "Packaged height field",
+              "summary": "Resolve a pinned Hara generator identity into a deterministic height-field fixture.",
+              "view": "portable-rules",
+              "state": "world/default-seed",
+              "project": "showcase/packaged-height-field",
+              "surface": "preview",
+              "docs": "showcase/packaged-height-field/README.md",
+              "tags": [
+                "rules",
+                "height-field",
+                "level:foundation",
+                "checks:4"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1180,
+                "height": 760
+              },
+              "default": true,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Falumbra&branch=main&commit=e4745bd01d68c30e6c2502774285922f2adb1677&path=packages%2Fhara%2Fshowcase%2Fpackaged-height-field&presentation=showcase&surface=preview&theme=dark"
+            }
+          ],
+          "registryPath": "packages/greenways/alumbra-hara/0.1.0.showcase.edn"
+        }
+      ]
+    },
+    {
+      "id": "greenways/alumbra-hodos",
+      "versions": [
+        {
+          "format": 1,
+          "package": "greenways/alumbra-hodos",
+          "version": "0.1.0",
+          "title": "Hodos Integration",
+          "summary": "Trusted Catalog and viewport adapters that keep demo selection separate from engine authority.",
+          "source": {
+            "repository": "greenways-ai/alumbra",
+            "commit": "e4745bd01d68c30e6c2502774285922f2adb1677",
+            "branch": "main",
+            "root": "packages/hodos"
+          },
+          "views": [
+            {
+              "id": "renderer-catalog",
+              "title": "Renderer Catalog",
+              "summary": "Open the installed playable laboratory by semantic activity identity beside its bounded Catalog projection."
+            }
+          ],
+          "states": [
+            {
+              "id": "catalog/playable-lab",
+              "title": "Playable lab selected",
+              "summary": "The renderer Catalog points at the installed playable lab without exposing its project path.",
+              "file": "showcase/states/renderer-catalog.edn"
+            }
+          ],
+          "demos": [
+            {
+              "id": "renderer-catalog",
+              "title": "Playable renderer Catalog",
+              "summary": "Open the installed playable laboratory by semantic activity identity beside its bounded Catalog projection.",
+              "view": "renderer-catalog",
+              "state": "catalog/playable-lab",
+              "project": "showcase/renderer-catalog",
+              "surface": "viewport",
+              "docs": "showcase/renderer-catalog/README.md",
+              "tags": [
+                "catalog",
+                "workspace",
+                "playable-lab",
+                "level:integration",
+                "checks:4"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1180,
+                "height": 760
+              },
+              "default": true,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Falumbra&branch=main&commit=e4745bd01d68c30e6c2502774285922f2adb1677&path=packages%2Fhodos%2Fshowcase%2Frenderer-catalog&presentation=showcase&surface=viewport&theme=dark"
+            }
+          ],
+          "registryPath": "packages/greenways/alumbra-hodos/0.1.0.showcase.edn"
+        }
+      ]
+    },
+    {
+      "id": "greenways/alumbra-renderer-playcanvas",
+      "versions": [
+        {
+          "format": 1,
+          "package": "greenways/alumbra-renderer-playcanvas",
+          "version": "0.1.0",
+          "title": "PlayCanvas Renderer",
+          "summary": "Voxel meshing, material grouping and picking projected from canonical Alumbra chunks.",
+          "source": {
+            "repository": "greenways-ai/alumbra",
+            "commit": "e4745bd01d68c30e6c2502774285922f2adb1677",
+            "branch": "main",
+            "root": "packages/renderer-playcanvas"
+          },
+          "views": [
+            {
+              "id": "greedy-meshing",
+              "title": "Greedy meshing",
+              "summary": "Compare a canonical voxel fixture with bounded quad and material-group evidence."
+            }
+          ],
+          "states": [
+            {
+              "id": "mesh/single-chunk",
+              "title": "Single meshed chunk",
+              "summary": "A bounded render-evidence fixture for one canonical chunk revision.",
+              "file": "showcase/states/greedy-meshing.edn"
+            }
+          ],
+          "demos": [
+            {
+              "id": "greedy-meshing",
+              "title": "Greedy meshing",
+              "summary": "Compare a canonical voxel fixture with bounded quad and material-group evidence.",
+              "view": "greedy-meshing",
+              "state": "mesh/single-chunk",
+              "project": "showcase/greedy-meshing",
+              "surface": "viewport",
+              "docs": "showcase/greedy-meshing/README.md",
+              "tags": [
+                "meshing",
+                "playcanvas",
+                "level:renderer",
+                "checks:3"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1180,
+                "height": 760
+              },
+              "default": true,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Falumbra&branch=main&commit=e4745bd01d68c30e6c2502774285922f2adb1677&path=packages%2Frenderer-playcanvas%2Fshowcase%2Fgreedy-meshing&presentation=showcase&surface=viewport&theme=dark"
+            }
+          ],
+          "registryPath": "packages/greenways/alumbra-renderer-playcanvas/0.1.0.showcase.edn"
+        }
+      ]
+    },
+    {
       "id": "greenways/hodos-2d",
       "versions": [
         {
@@ -200,14 +571,21 @@
           "package": "greenways/hodos-dev",
           "version": "0.1.0",
           "title": "Hodos Dev models",
-          "summary": "Serializable Explorer, Editor, Preview and REPL Workspace areas with closed semantic-event contracts.",
+          "summary": "Serializable Catalog, Explorer, Editor, Preview, REPL, Problems, Value Inspector and Execution Workspace areas with closed semantic-event contracts.",
           "source": {
             "repository": "greenways-ai/hodos",
-            "commit": "bc03cd3f1d566c94f961c47cce9cd4850a39be29",
+            "commit": "a9abd253d98afc7e257e8cf8bee67fbb916246f7",
             "branch": "main",
             "root": "packages/dev"
           },
           "views": [
+            {
+              "id": "catalog",
+              "title": "Catalog",
+              "summary": "Descriptive toolsets, activities, bounded check evidence and semantic learning requests.",
+              "source": "src/gw/hodos/dev/catalog.hal",
+              "docs": "README.md"
+            },
             {
               "id": "explorer",
               "title": "Explorer",
@@ -235,9 +613,36 @@
               "summary": "Session identity, namespace, status, input and transcript entries.",
               "source": "src/gw/hodos/dev/repl.hal",
               "docs": "README.md"
+            },
+            {
+              "id": "problems",
+              "title": "Problems",
+              "summary": "Structured diagnostics with source ranges, filters, counts and explicit source-navigation requests.",
+              "source": "src/gw/hodos/dev/problems.hal",
+              "docs": "README.md"
+            },
+            {
+              "id": "value-inspector",
+              "title": "Value Inspector",
+              "summary": "Bounded serializable values, paths, expansion state and retained evaluation context.",
+              "source": "src/gw/hodos/dev/value_inspector.hal",
+              "docs": "README.md"
+            },
+            {
+              "id": "execution",
+              "title": "Execution",
+              "summary": "Identity-safe metrics, compact events and bounded trace evidence without runtime ownership.",
+              "source": "src/gw/hodos/dev/execution.hal",
+              "docs": "README.md"
             }
           ],
           "states": [
+            {
+              "id": "catalog/activity",
+              "title": "Activity with check evidence",
+              "summary": "Two descriptive toolsets, one selected activity and a bounded failed check result.",
+              "file": "showcase/states/catalog-activity.edn"
+            },
             {
               "id": "explorer/project",
               "title": "Project files",
@@ -261,9 +666,91 @@
               "title": "Ready session",
               "summary": "A Hara session with input and retained result entries.",
               "file": "showcase/states/repl-ready.edn"
+            },
+            {
+              "id": "problems/source",
+              "title": "Source-linked diagnostics",
+              "summary": "A selected compiler error beside a retained runtime warning and active text filter.",
+              "file": "showcase/states/problems-source.edn"
+            },
+            {
+              "id": "value/nested",
+              "title": "Nested retained value",
+              "summary": "A selected path inside a bounded map value with stable expansion state.",
+              "file": "showcase/states/value-nested.edn"
+            },
+            {
+              "id": "execution/idle",
+              "title": "Idle",
+              "summary": "No live session and no retained evidence.",
+              "file": "showcase/states/execution-idle.edn"
+            },
+            {
+              "id": "execution/running",
+              "title": "Running",
+              "summary": "A bounded in-progress projection with Step, Run and Pause available.",
+              "file": "showcase/states/execution-running.edn"
+            },
+            {
+              "id": "execution/paused",
+              "title": "Paused",
+              "summary": "A source-linked boundary that can be stepped, run or resumed.",
+              "file": "showcase/states/execution-paused.edn"
+            },
+            {
+              "id": "execution/suspended",
+              "title": "Suspended",
+              "summary": "A promise boundary that requires explicit application settlement.",
+              "file": "showcase/states/execution-suspended.edn"
+            },
+            {
+              "id": "execution/returned",
+              "title": "Returned 7",
+              "summary": "Checked-in evidence for (+ 1 (* 2 3)) with terminal result 7.",
+              "file": "showcase/states/execution-returned.edn"
+            },
+            {
+              "id": "execution/failed",
+              "title": "Failed",
+              "summary": "A retained runtime failure with source-linked diagnostics.",
+              "file": "showcase/states/execution-failed.edn"
+            },
+            {
+              "id": "execution/bounded",
+              "title": "Bounded evidence",
+              "summary": "A retained tail with cumulative dropped and omitted counts.",
+              "file": "showcase/states/execution-bounded.edn"
+            },
+            {
+              "id": "execution/compact",
+              "title": "Compact result",
+              "summary": "A deliberately small retained projection for narrow viewports.",
+              "file": "showcase/states/execution-compact.edn"
             }
           ],
           "demos": [
+            {
+              "id": "catalog/activity",
+              "title": "Browse a bounded activity Catalog",
+              "summary": "Inspect descriptive toolsets, a selected activity and retained check evidence through a closed Catalog model.",
+              "view": "catalog",
+              "state": "catalog/activity",
+              "project": "showcase/catalog",
+              "surface": "catalog",
+              "docs": "showcase/catalog/README.md",
+              "tags": [
+                "catalog",
+                "activities",
+                "checks"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1100,
+                "height": 720
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=a9abd253d98afc7e257e8cf8bee67fbb916246f7&path=packages%2Fdev%2Fshowcase%2Fcatalog&presentation=showcase&surface=catalog&theme=dark"
+            },
             {
               "id": "explorer/project",
               "title": "Explore a Hara project",
@@ -284,7 +771,7 @@
                 "height": 720
               },
               "default": true,
-              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2Fdev%2Fshowcase%2Fexplorer&presentation=showcase&surface=files&theme=dark"
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=a9abd253d98afc7e257e8cf8bee67fbb916246f7&path=packages%2Fdev%2Fshowcase%2Fexplorer&presentation=showcase&surface=files&theme=dark"
             },
             {
               "id": "editor/live",
@@ -306,7 +793,7 @@
                 "height": 720
               },
               "default": false,
-              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2Fdev%2Fshowcase%2Feditor&presentation=showcase&surface=code&theme=dark"
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=a9abd253d98afc7e257e8cf8bee67fbb916246f7&path=packages%2Fdev%2Fshowcase%2Feditor&presentation=showcase&surface=code&theme=dark"
             },
             {
               "id": "preview/ready",
@@ -328,7 +815,7 @@
                 "height": 620
               },
               "default": false,
-              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2Fdev%2Fshowcase%2Fpreview&presentation=showcase&surface=preview&theme=dark"
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=a9abd253d98afc7e257e8cf8bee67fbb916246f7&path=packages%2Fdev%2Fshowcase%2Fpreview&presentation=showcase&surface=preview&theme=dark"
             },
             {
               "id": "repl/ready",
@@ -350,7 +837,95 @@
                 "height": 620
               },
               "default": false,
-              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2Fdev%2Fshowcase%2Frepl&presentation=showcase&surface=repl&theme=dark"
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=a9abd253d98afc7e257e8cf8bee67fbb916246f7&path=packages%2Fdev%2Fshowcase%2Frepl&presentation=showcase&surface=repl&theme=dark"
+            },
+            {
+              "id": "problems/source",
+              "title": "Inspect source-linked Problems",
+              "summary": "Filter structured diagnostics and inspect a selected compiler error without moving source authority into the component.",
+              "view": "problems",
+              "state": "problems/source",
+              "project": "showcase/problems",
+              "surface": "problems",
+              "docs": "showcase/problems/README.md",
+              "tags": [
+                "problems",
+                "diagnostics",
+                "source-range"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1100,
+                "height": 720
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=a9abd253d98afc7e257e8cf8bee67fbb916246f7&path=packages%2Fdev%2Fshowcase%2Fproblems&presentation=showcase&surface=problems&theme=dark"
+            },
+            {
+              "id": "value/nested",
+              "title": "Inspect a nested retained value",
+              "summary": "Navigate one selected path through bounded serializable data while retaining evaluation context.",
+              "view": "value-inspector",
+              "state": "value/nested",
+              "project": "showcase/value-inspector",
+              "surface": "value",
+              "docs": "showcase/value-inspector/README.md",
+              "tags": [
+                "value",
+                "inspection",
+                "retained-result"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1000,
+                "height": 680
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=a9abd253d98afc7e257e8cf8bee67fbb916246f7&path=packages%2Fdev%2Fshowcase%2Fvalue-inspector&presentation=showcase&surface=value&theme=dark"
+            },
+            {
+              "id": "execution/returned",
+              "title": "Inspect a returned Hara execution",
+              "summary": "Explore immutable result-7 metrics, events and source-linked trace snapshots.",
+              "view": "execution",
+              "state": "execution/returned",
+              "project": "showcase/execution",
+              "surface": "execution",
+              "docs": "showcase/execution/README.md",
+              "tags": [
+                "execution",
+                "trace",
+                "result-7"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1100,
+                "height": 720
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=a9abd253d98afc7e257e8cf8bee67fbb916246f7&path=packages%2Fdev%2Fshowcase%2Fexecution&presentation=showcase&surface=execution&theme=dark"
+            },
+            {
+              "id": "execution/compact",
+              "title": "Inspect Execution in a compact viewport",
+              "summary": "Exercise the same inert Execution surface with bounded evidence at phone width.",
+              "view": "execution",
+              "state": "execution/compact",
+              "project": "showcase/execution",
+              "surface": "execution",
+              "docs": "showcase/execution/README.md",
+              "tags": [
+                "execution",
+                "compact",
+                "responsive"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 520,
+                "height": 760
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=a9abd253d98afc7e257e8cf8bee67fbb916246f7&path=packages%2Fdev%2Fshowcase%2Fexecution&presentation=showcase&surface=execution&theme=dark"
             }
           ],
           "registryPath": "packages/greenways/hodos-dev/0.1.0.showcase.edn"
@@ -365,14 +940,21 @@
           "package": "greenways/hodos-dev-ui",
           "version": "0.1.0",
           "title": "Hodos Dev UI hosts",
-          "summary": "Trusted visible Explorer, Editor, Preview and REPL adapters driven by serializable Hodos Dev models.",
+          "summary": "Trusted visible Catalog, Explorer, Editor, Preview, REPL, Problems, Value Inspector and Execution adapters driven by serializable Hodos Dev models.",
           "source": {
             "repository": "greenways-ai/hodos",
-            "commit": "bc03cd3f1d566c94f961c47cce9cd4850a39be29",
+            "commit": "a9abd253d98afc7e257e8cf8bee67fbb916246f7",
             "branch": "main",
             "root": "packages/dev-ui"
           },
           "views": [
+            {
+              "id": "catalog-host",
+              "title": "Catalog host",
+              "summary": "A trusted descriptive Catalog host that emits only declared activity and tool requests.",
+              "source": "src/index.js",
+              "docs": "README.md"
+            },
             {
               "id": "explorer-host",
               "title": "Explorer host",
@@ -400,9 +982,36 @@
               "summary": "A visible session console emitting only declared semantic events.",
               "source": "src/index.js",
               "docs": "README.md"
+            },
+            {
+              "id": "problems-host",
+              "title": "Problems host",
+              "summary": "A trusted diagnostic list, filtering and source-navigation adapter over bounded problem values.",
+              "source": "src/index.js",
+              "docs": "README.md"
+            },
+            {
+              "id": "value-inspector-host",
+              "title": "Value Inspector host",
+              "summary": "A trusted tree and path adapter over serializable retained values.",
+              "source": "src/index.js",
+              "docs": "README.md"
+            },
+            {
+              "id": "execution-host",
+              "title": "Execution host",
+              "summary": "A bounded evidence renderer emitting semantic execution and editor-selection requests.",
+              "source": "src/index.js",
+              "docs": "README.md"
             }
           ],
           "states": [
+            {
+              "id": "catalog-host/activity",
+              "title": "Catalog host lifecycle",
+              "summary": "A visible activity selection with retained check evidence and semantic capabilities.",
+              "file": "showcase/states/catalog-host.edn"
+            },
             {
               "id": "explorer-host/project",
               "title": "Explorer host lifecycle",
@@ -422,9 +1031,49 @@
               "id": "repl-host/ready",
               "title": "REPL host lifecycle",
               "file": "showcase/states/repl-host.edn"
+            },
+            {
+              "id": "problems-host/source",
+              "title": "Problems host lifecycle",
+              "summary": "A selected source problem, active filter and host disposal boundary.",
+              "file": "showcase/states/problems-host.edn"
+            },
+            {
+              "id": "value-inspector-host/nested",
+              "title": "Value Inspector host lifecycle",
+              "summary": "A nested retained value with explicit selected and expanded paths.",
+              "file": "showcase/states/value-inspector-host.edn"
+            },
+            {
+              "id": "execution-host/returned",
+              "title": "Execution host lifecycle",
+              "summary": "Checked-in result-7 evidence, semantic controls, source selection and disposal.",
+              "file": "showcase/states/execution-host.edn"
             }
           ],
           "demos": [
+            {
+              "id": "catalog-host/activity",
+              "title": "Visible activity Catalog",
+              "summary": "Exercise the trusted Catalog host with descriptive tools, selected activity and bounded check evidence.",
+              "view": "catalog-host",
+              "state": "catalog-host/activity",
+              "project": "showcase/catalog-host",
+              "surface": "catalog",
+              "docs": "showcase/catalog-host/README.md",
+              "tags": [
+                "catalog",
+                "dom",
+                "activities"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1100,
+                "height": 720
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=a9abd253d98afc7e257e8cf8bee67fbb916246f7&path=packages%2Fdev-ui%2Fshowcase%2Fcatalog-host&presentation=showcase&surface=catalog&theme=dark"
+            },
             {
               "id": "explorer-host/project",
               "title": "Visible project Explorer",
@@ -445,7 +1094,7 @@
                 "height": 720
               },
               "default": true,
-              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2Fdev-ui%2Fshowcase%2Fexplorer-host&presentation=showcase&surface=files&theme=dark"
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=a9abd253d98afc7e257e8cf8bee67fbb916246f7&path=packages%2Fdev-ui%2Fshowcase%2Fexplorer-host&presentation=showcase&surface=files&theme=dark"
             },
             {
               "id": "editor-host/live",
@@ -467,7 +1116,7 @@
                 "height": 720
               },
               "default": false,
-              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2Fdev-ui%2Fshowcase%2Feditor-host&presentation=showcase&surface=code&theme=dark"
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=a9abd253d98afc7e257e8cf8bee67fbb916246f7&path=packages%2Fdev-ui%2Fshowcase%2Feditor-host&presentation=showcase&surface=code&theme=dark"
             },
             {
               "id": "preview-host/ready",
@@ -489,7 +1138,7 @@
                 "height": 620
               },
               "default": false,
-              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2Fdev-ui%2Fshowcase%2Fpreview-host&presentation=showcase&surface=preview&theme=dark"
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=a9abd253d98afc7e257e8cf8bee67fbb916246f7&path=packages%2Fdev-ui%2Fshowcase%2Fpreview-host&presentation=showcase&surface=preview&theme=dark"
             },
             {
               "id": "repl-host/ready",
@@ -511,7 +1160,95 @@
                 "height": 620
               },
               "default": false,
-              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=bc03cd3f1d566c94f961c47cce9cd4850a39be29&path=packages%2Fdev-ui%2Fshowcase%2Frepl-host&presentation=showcase&surface=repl&theme=dark"
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=a9abd253d98afc7e257e8cf8bee67fbb916246f7&path=packages%2Fdev-ui%2Fshowcase%2Frepl-host&presentation=showcase&surface=repl&theme=dark"
+            },
+            {
+              "id": "problems-host/source",
+              "title": "Visible Problems host",
+              "summary": "Filter and select structured diagnostics through the trusted host without transferring source authority.",
+              "view": "problems-host",
+              "state": "problems-host/source",
+              "project": "showcase/problems-host",
+              "surface": "problems",
+              "docs": "showcase/problems-host/README.md",
+              "tags": [
+                "problems",
+                "dom",
+                "source-navigation"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1100,
+                "height": 720
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=a9abd253d98afc7e257e8cf8bee67fbb916246f7&path=packages%2Fdev-ui%2Fshowcase%2Fproblems-host&presentation=showcase&surface=problems&theme=dark"
+            },
+            {
+              "id": "value-inspector-host/nested",
+              "title": "Visible Value Inspector",
+              "summary": "Navigate a nested serializable value through the trusted host and closed semantic events.",
+              "view": "value-inspector-host",
+              "state": "value-inspector-host/nested",
+              "project": "showcase/value-inspector-host",
+              "surface": "value",
+              "docs": "showcase/value-inspector-host/README.md",
+              "tags": [
+                "value",
+                "dom",
+                "tree"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1000,
+                "height": 680
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=a9abd253d98afc7e257e8cf8bee67fbb916246f7&path=packages%2Fdev-ui%2Fshowcase%2Fvalue-inspector-host&presentation=showcase&surface=value&theme=dark"
+            },
+            {
+              "id": "execution-host/returned",
+              "title": "Visible returned Execution",
+              "summary": "Render immutable result-7 evidence and exercise semantic controls and source selection.",
+              "view": "execution-host",
+              "state": "execution-host/returned",
+              "project": "showcase/execution-host",
+              "surface": "execution",
+              "docs": "showcase/execution-host/README.md",
+              "tags": [
+                "execution",
+                "dom",
+                "result-7"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1100,
+                "height": 720
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=a9abd253d98afc7e257e8cf8bee67fbb916246f7&path=packages%2Fdev-ui%2Fshowcase%2Fexecution-host&presentation=showcase&surface=execution&theme=dark"
+            },
+            {
+              "id": "execution-host/compact",
+              "title": "Visible compact Execution",
+              "summary": "Use the shipped responsive host at phone width without a second renderer.",
+              "view": "execution-host",
+              "state": "execution-host/returned",
+              "project": "showcase/execution-host",
+              "surface": "execution",
+              "docs": "showcase/execution-host/README.md",
+              "tags": [
+                "execution",
+                "compact",
+                "responsive"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 520,
+                "height": 760
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=greenways-ai%2Fhodos&branch=main&commit=a9abd253d98afc7e257e8cf8bee67fbb916246f7&path=packages%2Fdev-ui%2Fshowcase%2Fexecution-host&presentation=showcase&surface=execution&theme=dark"
             }
           ],
           "registryPath": "packages/greenways/hodos-dev-ui/0.1.0.showcase.edn"
@@ -603,6 +1340,106 @@
             }
           ],
           "registryPath": "packages/greenways/hodos-workspace-ui/0.1.0.showcase.edn"
+        }
+      ]
+    },
+    {
+      "id": "greenways/supersonic",
+      "versions": [
+        {
+          "format": 1,
+          "package": "greenways/supersonic",
+          "version": "0.1.0",
+          "title": "Supersonic",
+          "summary": "Declarative Hara audio graphs with typed live updates and browser-owned playback authority.",
+          "source": {
+            "repository": "hara-lang/hara",
+            "commit": "10dab3f952a424bba37e8bcd1b1c3270455a850a",
+            "branch": "main",
+            "root": "contrib/greenways/supersonic"
+          },
+          "views": [
+            {
+              "id": "graph-contract",
+              "title": "Audio graph contract",
+              "summary": "Inspect the portable graph, typed controls and connection topology before granting playback authority.",
+              "source": "src/hal/gw/audio/supersonic.hal",
+              "docs": "README.md"
+            },
+            {
+              "id": "live-graph",
+              "title": "Live graph",
+              "summary": "Start a silent graph, authorize browser audio with one gesture and retain typed updates across replacement.",
+              "source": "src/hal/gw/audio/supersonic.hal",
+              "docs": "README.md"
+            }
+          ],
+          "states": [
+            {
+              "id": "graph/contract",
+              "title": "Portable graph value",
+              "summary": "A renderer-neutral oscillator, gain and output graph with bounded typed controls.",
+              "file": "showcase/states/graph-contract.edn"
+            },
+            {
+              "id": "graph/glass-signal",
+              "title": "Glass Signal",
+              "summary": "A silent-by-default sequenced graph ready for explicit browser playback authorization.",
+              "file": "showcase/states/glass-signal.edn"
+            }
+          ],
+          "demos": [
+            {
+              "id": "inspect-audio-graph",
+              "title": "Inspect an audio graph",
+              "summary": "Read the portable graph topology and typed controls without creating browser audio resources.",
+              "view": "graph-contract",
+              "state": "graph/contract",
+              "project": "showcase/graph-contract",
+              "surface": "preview",
+              "docs": "showcase/graph-contract/README.md",
+              "tags": [
+                "audio-graph",
+                "typed-controls",
+                "portable-value",
+                "level:foundation",
+                "checks:4"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1180,
+                "height": 760
+              },
+              "default": true,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=hara-lang%2Fhara&branch=main&commit=10dab3f952a424bba37e8bcd1b1c3270455a850a&path=contrib%2Fgreenways%2Fsupersonic%2Fshowcase%2Fgraph-contract&presentation=showcase&surface=preview&theme=dark"
+            },
+            {
+              "id": "glass-signal",
+              "title": "Play and reshape Glass Signal",
+              "summary": "Authorize one browser-owned graph, then evaluate typed updates without resetting its musical clock.",
+              "view": "live-graph",
+              "state": "graph/glass-signal",
+              "project": "showcase/glass-signal",
+              "surface": "audio",
+              "docs": "showcase/glass-signal/README.md",
+              "tags": [
+                "audio",
+                "sequencer",
+                "live-update",
+                "user-gesture",
+                "level:runtime",
+                "checks:4"
+              ],
+              "theme": "dark",
+              "viewport": {
+                "width": 1180,
+                "height": 760
+              },
+              "default": false,
+              "playgroundUrl": "https://playground.hara-lang.org/?repo=hara-lang%2Fhara&branch=main&commit=10dab3f952a424bba37e8bcd1b1c3270455a850a&path=contrib%2Fgreenways%2Fsupersonic%2Fshowcase%2Fglass-signal&presentation=showcase&surface=audio&theme=dark"
+            }
+          ],
+          "registryPath": "packages/greenways/supersonic/0.1.0.showcase.edn"
         }
       ]
     }
