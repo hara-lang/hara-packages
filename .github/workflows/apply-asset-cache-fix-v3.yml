@@ -1,0 +1,266 @@
+name: Apply Packages asset cache hotfix v3
+
+on:
+  push:
+    branches:
+      - agent/fix-packages-asset-cache
+    paths:
+      - ".github/workflows/apply-asset-cache-fix-v3.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/fix-packages-asset-cache
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Apply cache-safe asset references and checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PY'
+          from pathlib import Path
+
+          release = "20260809-1"
+
+          index = Path("site/index.html")
+          text = index.read_text()
+          replacements = {
+              "./vendor/visual-language/hara-logo.svg": f"/vendor/visual-language/hara-logo.svg?v={release}",
+              "./vendor/visual-language/theme.css": f"/vendor/visual-language/theme.css?v={release}",
+              "./page.css": f"/page.css?v={release}",
+              "./public-shell.css": f"/public-shell.css?v={release}",
+              "./visual-refresh.css": f"/visual-refresh.css?v={release}",
+              "./theme-toggle.js": f"/theme-toggle.js?v={release}",
+              "./gallery.js": f"/gallery.js?v={release}",
+          }
+          for old, new in replacements.items():
+              if old not in text:
+                  raise SystemExit(f"missing expected reference in site/index.html: {old}")
+              text = text.replace(old, new)
+          index.write_text(text)
+
+          theme = Path("site/vendor/visual-language/theme.css")
+          text = theme.read_text()
+          old = '@import "./tokens.css";'
+          if old not in text:
+              raise SystemExit("missing tokens.css import")
+          theme.write_text(text.replace(old, f'@import "./tokens.css?v={release}";'))
+
+          toggle = Path("site/theme-toggle.js")
+          text = toggle.read_text()
+          old = 'from "./vendor/visual-language/theme.js";'
+          if old not in text:
+              raise SystemExit("missing theme.js import")
+          toggle.write_text(text.replace(old, f'from "./vendor/visual-language/theme.js?v={release}";'))
+
+          header_paths = [
+              "/page.css",
+              "/public-shell.css",
+              "/visual-refresh.css",
+              "/theme-toggle.js",
+              "/gallery.js",
+              "/gallery.json",
+              "/index.json",
+              "/vendor/visual-language/theme.css",
+              "/vendor/visual-language/tokens.css",
+              "/vendor/visual-language/theme.js",
+          ]
+          config = Path("netlify.toml")
+          text = config.read_text().rstrip() + "\n\n"
+          for path in header_paths:
+              text += (
+                  "[[headers]]\n"
+                  f'  for = "{path}"\n'
+                  "  [headers.values]\n"
+                  '    Cache-Control = "public, max-age=0, must-revalidate"\n'
+                  '    X-Content-Type-Options = "nosniff"\n\n'
+              )
+          config.write_text(text)
+
+          visual_test = Path("test/site-visual-language.test.mjs")
+          text = visual_test.read_text()
+          old = 'assert.match(theme, /@import "\\.\\/tokens\\.css"/);'
+          new = 'assert.match(theme, /@import "\\.\\/tokens\\.css\\?v=20260809-1"/);'
+          if old not in text:
+              raise SystemExit("missing visual-language import assertion")
+          visual_test.write_text(text.replace(old, new))
+          PY
+
+          cat > .github/scripts/verify-static-assets.sh <<'SH'
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          : "${HARA_SITE_ORIGIN:?HARA_SITE_ORIGIN is required}"
+          origin="${HARA_SITE_ORIGIN%/}"
+          release="20260809-1"
+          work="$(mktemp -d)"
+          trap 'rm -rf "$work"' EXIT
+
+          assets=(
+            "/vendor/visual-language/theme.css?v=${release}|text/css"
+            "/vendor/visual-language/tokens.css?v=${release}|text/css"
+            "/page.css?v=${release}|text/css"
+            "/public-shell.css?v=${release}|text/css"
+            "/visual-refresh.css?v=${release}|text/css"
+            "/theme-toggle.js?v=${release}|javascript"
+            "/vendor/visual-language/theme.js?v=${release}|javascript"
+            "/gallery.js?v=${release}|javascript"
+            "/gallery.json|application/json"
+          )
+
+          for entry in "${assets[@]}"; do
+            path="${entry%%|*}"
+            expected="${entry#*|}"
+            name="$(printf '%s' "$path" | tr '/?=&' '____')"
+            headers="$work/${name}.headers"
+            body="$work/${name}.body"
+            status="$(curl --silent --show-error --location --compressed \
+              --dump-header "$headers" \
+              --output "$body" \
+              --write-out '%{http_code}' \
+              "${origin}${path}")"
+
+            [[ "$status" == "200" ]] || {
+              echo "${path} returned HTTP ${status}." >&2
+              exit 1
+            }
+
+            content_type="$(awk 'BEGIN{IGNORECASE=1} /^content-type:/ {sub(/^content-type:[[:space:]]*/, ""); sub(/\r$/, ""); value=$0} END{print value}' "$headers")"
+            case "$expected" in
+              javascript)
+                [[ "$content_type" =~ ^(application|text)/(javascript|x-javascript) ]] || {
+                  echo "${path} returned ${content_type}, not JavaScript." >&2
+                  exit 1
+                }
+                ;;
+              *)
+                [[ "$content_type" == "$expected"* ]] || {
+                  echo "${path} returned ${content_type}, expected ${expected}." >&2
+                  exit 1
+                }
+                ;;
+            esac
+
+            cache_control="$(awk 'BEGIN{IGNORECASE=1} /^cache-control:/ {sub(/^cache-control:[[:space:]]*/, ""); sub(/\r$/, ""); value=$0} END{print value}' "$headers")"
+            [[ "$cache_control" == *"max-age=0"* && "$cache_control" == *"must-revalidate"* ]] || {
+              echo "${path} is still browser-cacheable without revalidation: ${cache_control}" >&2
+              exit 1
+            }
+
+            [[ -s "$body" ]] || {
+              echo "${path} returned an empty body." >&2
+              exit 1
+            }
+          done
+
+          curl --fail --silent --show-error --location --compressed \
+            "${origin}/" > "$work/index.html"
+          for reference in \
+            "/vendor/visual-language/theme.css?v=${release}" \
+            "/page.css?v=${release}" \
+            "/public-shell.css?v=${release}" \
+            "/visual-refresh.css?v=${release}" \
+            "/theme-toggle.js?v=${release}" \
+            "/gallery.js?v=${release}"; do
+            grep -Fq "$reference" "$work/index.html" || {
+              echo "The live page does not reference ${reference}." >&2
+              exit 1
+            }
+          done
+
+          echo "Verified cache-safe Packages assets at ${origin}."
+          SH
+          chmod +x .github/scripts/verify-static-assets.sh
+
+          cat > test/site-assets.test.mjs <<'JS'
+          import assert from "node:assert/strict";
+          import { readFile } from "node:fs/promises";
+          import test from "node:test";
+
+          const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
+          const [page, theme, toggle, config, verifier] = await Promise.all([
+            read("../site/index.html"),
+            read("../site/vendor/visual-language/theme.css"),
+            read("../site/theme-toggle.js"),
+            read("../netlify.toml"),
+            read("../.github/scripts/verify-static-assets.sh"),
+          ]);
+
+          const release = "20260809-1";
+          const mutableAssets = [
+            "/vendor/visual-language/theme.css",
+            "/page.css",
+            "/public-shell.css",
+            "/visual-refresh.css",
+            "/theme-toggle.js",
+            "/gallery.js",
+          ];
+
+          test("the public page cache-busts every mutable presentation asset", () => {
+            for (const asset of mutableAssets) {
+              assert.ok(page.includes(`${asset}?v=${release}`), `${asset} is not cache-busted`);
+            }
+            assert.ok(theme.includes(`tokens.css?v=${release}`));
+            assert.ok(toggle.includes(`theme.js?v=${release}`));
+          });
+
+          test("Netlify requires mutable assets to revalidate", () => {
+            for (const asset of [
+              "/page.css",
+              "/public-shell.css",
+              "/visual-refresh.css",
+              "/theme-toggle.js",
+              "/gallery.js",
+              "/gallery.json",
+              "/index.json",
+              "/vendor/visual-language/theme.css",
+              "/vendor/visual-language/tokens.css",
+              "/vendor/visual-language/theme.js",
+            ]) {
+              const start = config.indexOf(`for = "${asset}"`);
+              assert.notEqual(start, -1, `${asset} has no Netlify header block`);
+              const next = config.indexOf("[[headers]]", start + 1);
+              const block = config.slice(start, next === -1 ? config.length : next);
+              assert.match(block, /Cache-Control = "public, max-age=0, must-revalidate"/);
+              assert.match(block, /X-Content-Type-Options = "nosniff"/);
+            }
+          });
+
+          test("the live verifier checks MIME, cache and document references", () => {
+            assert.match(verifier, /content-type:/i);
+            assert.match(verifier, /max-age=0/);
+            assert.match(verifier, /must-revalidate/);
+            assert.match(verifier, /Verified cache-safe Packages assets/);
+          });
+          JS
+
+      - name: Validate the hotfix
+        run: npm run validate
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Commit the source hotfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- \
+            .github/scripts/verify-static-assets.sh \
+            netlify.toml \
+            site/index.html \
+            site/theme-toggle.js \
+            site/vendor/visual-language/theme.css \
+            test/site-assets.test.mjs \
+            test/site-visual-language.test.mjs
+          git commit -m "Prevent stale Packages presentation assets"
+          git push origin HEAD:agent/fix-packages-asset-cache
