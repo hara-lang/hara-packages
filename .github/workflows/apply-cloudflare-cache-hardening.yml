@@ -1,0 +1,344 @@
+name: Apply commit-addressed Packages assets
+
+on:
+  push:
+    branches:
+      - agent/fix-packages-cloudflare-cache
+    paths:
+      - ".github/workflows/apply-cloudflare-cache-hardening.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/fix-packages-cloudflare-cache
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build commit-addressed asset support
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PY'
+          import json
+          from pathlib import Path
+
+          gallery = Path("site/gallery.js")
+          text = gallery.read_text()
+          marker = 'const GALLERY_FORMAT = 1;\n'
+          if 'const ASSET_VERSION = "20260809-1";' not in text:
+              if marker not in text:
+                  raise SystemExit("Gallery format marker not found")
+              text = text.replace(marker, marker + 'const ASSET_VERSION = "20260809-1";\n', 1)
+          old = 'fetch("./gallery.json", { cache: "no-store", headers: { Accept: "application/json" } })'
+          new = 'fetch(`./gallery.json?v=${ASSET_VERSION}`, { cache: "no-store", headers: { Accept: "application/json" } })'
+          if old not in text:
+              raise SystemExit("Gallery index request was not found")
+          gallery.write_text(text.replace(old, new, 1))
+
+          package_path = Path("package.json")
+          package = json.loads(package_path.read_text())
+          package.setdefault("scripts", {})["assets:version"] = "node scripts/version-site-assets.mjs"
+          package_path.write_text(json.dumps(package, indent=2) + "\n")
+          PY
+
+          cat > scripts/version-site-assets.mjs <<'JS'
+          import { readFile, writeFile } from "node:fs/promises";
+          import path from "node:path";
+          import { fileURLToPath } from "node:url";
+
+          export const SOURCE_ASSET_VERSION = "20260809-1";
+          export const DEPLOY_VERSION_PATTERN = /^[0-9a-f]{40}$/;
+          export const VERSIONED_SITE_FILES = Object.freeze([
+            "site/index.html",
+            "site/vendor/visual-language/theme.css",
+            "site/theme-toggle.js",
+            "site/gallery.js",
+          ]);
+
+          function versionQueries(text, version) {
+            return text.replace(
+              /(\?v=)(?:20260809-1|[0-9a-f]{40})/g,
+              `$1${version}`,
+            );
+          }
+
+          function versionGalleryConstant(text, version) {
+            return text.replace(
+              /(const ASSET_VERSION = ")(?:20260809-1|[0-9a-f]{40})(";)/,
+              `$1${version}$2`,
+            );
+          }
+
+          export async function versionSiteAssets(version, {
+            root = process.cwd(),
+            files = VERSIONED_SITE_FILES,
+          } = {}) {
+            if (!DEPLOY_VERSION_PATTERN.test(version)) {
+              throw new TypeError("The deployed asset version must be one exact 40-character Git commit SHA.");
+            }
+
+            const changed = [];
+            for (const relative of files) {
+              const filename = path.resolve(root, relative);
+              const source = await readFile(filename, "utf8");
+              const next = versionGalleryConstant(versionQueries(source, version), version);
+              if (next === source) {
+                throw new Error(`No versioned asset marker was found in ${relative}.`);
+              }
+              await writeFile(filename, next);
+              changed.push(relative);
+            }
+            return changed;
+          }
+
+          const invoked = process.argv[1]
+            && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+          if (invoked) {
+            const version = String(process.argv[2] || "").trim();
+            const changed = await versionSiteAssets(version);
+            console.log(`Versioned ${changed.length} Packages asset documents at ${version}.`);
+          }
+          JS
+
+          cat > .github/scripts/verify-static-assets.sh <<'SH'
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          : "${HARA_SITE_ORIGIN:?HARA_SITE_ORIGIN is required}"
+          : "${HARA_ASSET_VERSION:?HARA_ASSET_VERSION is required}"
+          origin="${HARA_SITE_ORIGIN%/}"
+          version="${HARA_ASSET_VERSION}"
+          [[ "$version" =~ ^[0-9a-f]{40}$ ]] || {
+            echo "HARA_ASSET_VERSION must be one exact Git commit SHA." >&2
+            exit 1
+          }
+
+          work="$(mktemp -d)"
+          trap 'rm -rf "$work"' EXIT
+          assets=(
+            "/|text/html|site/index.html"
+            "/vendor/visual-language/hara-logo.svg|image/svg+xml|site/vendor/visual-language/hara-logo.svg"
+            "/vendor/visual-language/theme.css|text/css|site/vendor/visual-language/theme.css"
+            "/vendor/visual-language/tokens.css|text/css|site/vendor/visual-language/tokens.css"
+            "/page.css|text/css|site/page.css"
+            "/public-shell.css|text/css|site/public-shell.css"
+            "/visual-refresh.css|text/css|site/visual-refresh.css"
+            "/theme-toggle.js|javascript|site/theme-toggle.js"
+            "/vendor/visual-language/theme.js|javascript|site/vendor/visual-language/theme.js"
+            "/gallery.js|javascript|site/gallery.js"
+            "/gallery.json|application/json|site/gallery.json"
+          )
+
+          for entry in "${assets[@]}"; do
+            IFS='|' read -r path expected local_path <<< "$entry"
+            name="$(printf '%s' "$path" | tr '/?=&' '____')"
+            headers="$work/${name}.headers"
+            body="$work/${name}.body"
+            separator="?"
+            [[ "$path" == *"?"* ]] && separator="&"
+            status="$(curl --silent --show-error --location --compressed \
+              --dump-header "$headers" \
+              --output "$body" \
+              --write-out '%{http_code}' \
+              "${origin}${path}${separator}v=${version}")"
+
+            [[ "$status" == "200" ]] || {
+              echo "${path} returned HTTP ${status}." >&2
+              exit 1
+            }
+
+            content_type="$(awk 'BEGIN{IGNORECASE=1} /^content-type:/ {sub(/^content-type:[[:space:]]*/, ""); sub(/\r$/, ""); value=$0} END{print value}' "$headers")"
+            case "$expected" in
+              javascript)
+                [[ "$content_type" =~ ^(application|text)/(javascript|x-javascript) ]] || {
+                  echo "${path} returned ${content_type}, not JavaScript." >&2
+                  exit 1
+                }
+                ;;
+              *)
+                [[ "$content_type" == "$expected"* ]] || {
+                  echo "${path} returned ${content_type}, expected ${expected}." >&2
+                  exit 1
+                }
+                ;;
+            esac
+
+            [[ -s "$body" ]] || {
+              echo "${path} returned an empty body." >&2
+              exit 1
+            }
+
+            local_hash="$(sha256sum "$local_path" | awk '{print $1}')"
+            remote_hash="$(sha256sum "$body" | awk '{print $1}')"
+            [[ "$remote_hash" == "$local_hash" ]] || {
+              echo "${path} did not return the bytes deployed from ${local_path}." >&2
+              echo "local=${local_hash} remote=${remote_hash}" >&2
+              exit 1
+            }
+          done
+
+          for reference in \
+            "/vendor/visual-language/hara-logo.svg?v=${version}" \
+            "/vendor/visual-language/theme.css?v=${version}" \
+            "/page.css?v=${version}" \
+            "/public-shell.css?v=${version}" \
+            "/visual-refresh.css?v=${version}" \
+            "/theme-toggle.js?v=${version}" \
+            "/gallery.js?v=${version}"; do
+            grep -Fq "$reference" "$work/_.body" || {
+              echo "The live page does not reference ${reference}." >&2
+              exit 1
+            }
+          done
+          grep -Fq "tokens.css?v=${version}" "$work/_vendor_visual-language_theme.css.body"
+          grep -Fq "theme.js?v=${version}" "$work/_theme-toggle.js.body"
+          grep -Fq "gallery.json?v=\${ASSET_VERSION}" "$work/_gallery.js.body"
+          grep -Fq "const ASSET_VERSION = \"${version}\";" "$work/_gallery.js.body"
+
+          echo "Verified commit-addressed Packages assets at ${origin} for ${version}."
+          SH
+          chmod +x .github/scripts/verify-static-assets.sh
+
+          cat > test/site-asset-versioning.test.mjs <<'JS'
+          import assert from "node:assert/strict";
+          import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+          import os from "node:os";
+          import path from "node:path";
+          import test from "node:test";
+          import {
+            DEPLOY_VERSION_PATTERN,
+            SOURCE_ASSET_VERSION,
+            versionSiteAssets,
+          } from "../scripts/version-site-assets.mjs";
+
+          test("versions every public asset edge with one exact commit", async () => {
+            const root = await mkdtemp(path.join(os.tmpdir(), "hara-packages-assets-"));
+            const files = ["index.html", "theme.css", "theme-toggle.js", "gallery.js"];
+            try {
+              for (const file of files) {
+                await writeFile(path.join(root, file), file === "gallery.js"
+                  ? `const ASSET_VERSION = "${SOURCE_ASSET_VERSION}";\nfetch(\`./gallery.json?v=\${ASSET_VERSION}\`);\n`
+                  : `asset?v=${SOURCE_ASSET_VERSION}\n`);
+              }
+              const first = "a".repeat(40);
+              const second = "b".repeat(40);
+              assert.equal(DEPLOY_VERSION_PATTERN.test(first), true);
+              await versionSiteAssets(first, { root, files });
+              await versionSiteAssets(second, { root, files });
+              for (const file of files) {
+                const output = await readFile(path.join(root, file), "utf8");
+                assert.doesNotMatch(output, new RegExp(SOURCE_ASSET_VERSION));
+                assert.doesNotMatch(output, new RegExp(first));
+                assert.match(output, new RegExp(second));
+              }
+            } finally {
+              await rm(root, { recursive: true, force: true });
+            }
+          });
+
+          test("rejects versions that are not exact Git commit SHAs", async () => {
+            await assert.rejects(
+              versionSiteAssets("release-latest", { root: ".", files: [] }),
+              /40-character Git commit SHA/,
+            );
+          });
+          JS
+
+          cat > test/site-assets.test.mjs <<'JS'
+          import assert from "node:assert/strict";
+          import { readFile } from "node:fs/promises";
+          import test from "node:test";
+
+          const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
+          const [page, theme, toggle, gallery, config, verifier, packageJson, versioner] = await Promise.all([
+            read("../site/index.html"),
+            read("../site/vendor/visual-language/theme.css"),
+            read("../site/theme-toggle.js"),
+            read("../site/gallery.js"),
+            read("../netlify.toml"),
+            read("../.github/scripts/verify-static-assets.sh"),
+            read("../package.json"),
+            read("../scripts/version-site-assets.mjs"),
+          ]);
+
+          const release = "20260809-1";
+          const mutableAssets = [
+            "/vendor/visual-language/theme.css",
+            "/page.css",
+            "/public-shell.css",
+            "/visual-refresh.css",
+            "/theme-toggle.js",
+            "/gallery.js",
+          ];
+
+          test("the source page marks every mutable presentation edge for deployment versioning", () => {
+            for (const asset of mutableAssets) {
+              assert.ok(page.includes(`${asset}?v=${release}`), `${asset} is not cache-busted`);
+            }
+            assert.ok(theme.includes(`tokens.css?v=${release}`));
+            assert.ok(toggle.includes(`theme.js?v=${release}`));
+            assert.match(gallery, /const ASSET_VERSION = "20260809-1";/);
+            assert.match(gallery, /gallery\.json\?v=\$\{ASSET_VERSION\}/);
+          });
+
+          test("Netlify preserves origin revalidation for mutable asset paths", () => {
+            for (const asset of [
+              "/page.css",
+              "/public-shell.css",
+              "/visual-refresh.css",
+              "/theme-toggle.js",
+              "/gallery.js",
+              "/gallery.json",
+              "/index.json",
+              "/vendor/visual-language/theme.css",
+              "/vendor/visual-language/tokens.css",
+              "/vendor/visual-language/theme.js",
+            ]) {
+              const start = config.indexOf(`for = "${asset}"`);
+              assert.notEqual(start, -1, `${asset} has no Netlify header block`);
+              const next = config.indexOf("[[headers]]", start + 1);
+              const block = config.slice(start, next === -1 ? config.length : next);
+              assert.match(block, /Cache-Control = "public, max-age=0, must-revalidate"/);
+              assert.match(block, /X-Content-Type-Options = "nosniff"/);
+            }
+          });
+
+          test("the deployment versioner and live verifier prove exact public bytes", () => {
+            assert.match(packageJson, /"assets:version": "node scripts\/version-site-assets\.mjs"/);
+            assert.match(versioner, /40-character Git commit SHA/);
+            assert.match(verifier, /HARA_ASSET_VERSION/);
+            assert.match(verifier, /sha256sum/);
+            assert.match(verifier, /did not return the bytes deployed/);
+            assert.match(verifier, /Verified commit-addressed Packages assets/);
+            assert.doesNotMatch(verifier, /max-age=0.*exit 1/s);
+          });
+          JS
+
+      - name: Validate source hardening
+        run: npm run validate
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Commit source hardening
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- \
+            .github/scripts/verify-static-assets.sh \
+            package.json \
+            scripts/version-site-assets.mjs \
+            site/gallery.js \
+            test/site-assets.test.mjs \
+            test/site-asset-versioning.test.mjs
+          git commit -m "Address Packages assets by deployment commit"
+          git push origin HEAD:agent/fix-packages-cloudflare-cache
