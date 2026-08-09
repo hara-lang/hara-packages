@@ -3,12 +3,16 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
-const [page, theme, toggle, config, verifier] = await Promise.all([
+const [page, theme, toggle, gallery, config, verifier, packageJson, versioner, browserVerifier] = await Promise.all([
   read("../site/index.html"),
   read("../site/vendor/visual-language/theme.css"),
   read("../site/theme-toggle.js"),
+  read("../site/gallery.js"),
   read("../netlify.toml"),
   read("../.github/scripts/verify-static-assets.sh"),
+  read("../package.json"),
+  read("../scripts/version-site-assets.mjs"),
+  read("../scripts/verify-gallery-browser.mjs"),
 ]);
 
 const release = "20260809-1";
@@ -21,15 +25,17 @@ const mutableAssets = [
   "/gallery.js",
 ];
 
-test("the public page cache-busts every mutable presentation asset", () => {
+test("the source page marks every mutable presentation edge for deployment versioning", () => {
   for (const asset of mutableAssets) {
     assert.ok(page.includes(`${asset}?v=${release}`), `${asset} is not cache-busted`);
   }
   assert.ok(theme.includes(`tokens.css?v=${release}`));
   assert.ok(toggle.includes(`theme.js?v=${release}`));
+  assert.match(gallery, /const ASSET_VERSION = "20260809-1";/);
+  assert.match(gallery, /gallery\.json\?v=\$\{ASSET_VERSION\}/);
 });
 
-test("Netlify requires mutable assets to revalidate", () => {
+test("Netlify preserves origin revalidation for mutable asset paths", () => {
   for (const asset of [
     "/page.css",
     "/public-shell.css",
@@ -51,9 +57,16 @@ test("Netlify requires mutable assets to revalidate", () => {
   }
 });
 
-test("the live verifier checks MIME, cache and document references", () => {
-  assert.match(verifier, /content-type:/i);
-  assert.match(verifier, /max-age=0/);
-  assert.match(verifier, /must-revalidate/);
-  assert.match(verifier, /Verified cache-safe Packages assets/);
+test("the deployment versioner and live verifier prove exact public bytes", () => {
+  assert.match(packageJson, /"assets:version": "node scripts\/version-site-assets\.mjs"/);
+  assert.match(versioner, /40-character Git commit SHA/);
+  assert.match(verifier, /HARA_ASSET_VERSION/);
+  assert.match(verifier, /sha256sum/);
+  assert.match(verifier, /did not return the bytes deployed/);
+  assert.match(verifier, /Verified commit-addressed Packages assets/);
+  assert.doesNotMatch(verifier, /max-age=0.*exit 1/s);
+});
+
+test("the Chromium empty-state fixture accepts the versioned Gallery index URL", () => {
+  assert.match(browserVerifier, /emptyPage\.route\("\*\*\/gallery\.json\*"/);
 });

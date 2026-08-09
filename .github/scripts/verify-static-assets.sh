@@ -2,34 +2,42 @@
 set -euo pipefail
 
 : "${HARA_SITE_ORIGIN:?HARA_SITE_ORIGIN is required}"
+: "${HARA_ASSET_VERSION:?HARA_ASSET_VERSION is required}"
 origin="${HARA_SITE_ORIGIN%/}"
-release="20260809-1"
+version="${HARA_ASSET_VERSION}"
+[[ "$version" =~ ^[0-9a-f]{40}$ ]] || {
+  echo "HARA_ASSET_VERSION must be one exact Git commit SHA." >&2
+  exit 1
+}
+
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
-
 assets=(
-  "/vendor/visual-language/theme.css?v=${release}|text/css"
-  "/vendor/visual-language/tokens.css?v=${release}|text/css"
-  "/page.css?v=${release}|text/css"
-  "/public-shell.css?v=${release}|text/css"
-  "/visual-refresh.css?v=${release}|text/css"
-  "/theme-toggle.js?v=${release}|javascript"
-  "/vendor/visual-language/theme.js?v=${release}|javascript"
-  "/gallery.js?v=${release}|javascript"
-  "/gallery.json|application/json"
+  "/|text/html|site/index.html"
+  "/vendor/visual-language/hara-logo.svg|image/svg+xml|site/vendor/visual-language/hara-logo.svg"
+  "/vendor/visual-language/theme.css|text/css|site/vendor/visual-language/theme.css"
+  "/vendor/visual-language/tokens.css|text/css|site/vendor/visual-language/tokens.css"
+  "/page.css|text/css|site/page.css"
+  "/public-shell.css|text/css|site/public-shell.css"
+  "/visual-refresh.css|text/css|site/visual-refresh.css"
+  "/theme-toggle.js|javascript|site/theme-toggle.js"
+  "/vendor/visual-language/theme.js|javascript|site/vendor/visual-language/theme.js"
+  "/gallery.js|javascript|site/gallery.js"
+  "/gallery.json|application/json|site/gallery.json"
 )
 
 for entry in "${assets[@]}"; do
-  path="${entry%%|*}"
-  expected="${entry#*|}"
+  IFS='|' read -r path expected local_path <<< "$entry"
   name="$(printf '%s' "$path" | tr '/?=&' '____')"
   headers="$work/${name}.headers"
   body="$work/${name}.body"
+  separator="?"
+  [[ "$path" == *"?"* ]] && separator="&"
   status="$(curl --silent --show-error --location --compressed \
     --dump-header "$headers" \
     --output "$body" \
     --write-out '%{http_code}' \
-    "${origin}${path}")"
+    "${origin}${path}${separator}v=${version}")"
 
   [[ "$status" == "200" ]] || {
     echo "${path} returned HTTP ${status}." >&2
@@ -52,31 +60,36 @@ for entry in "${assets[@]}"; do
       ;;
   esac
 
-  cache_control="$(awk 'BEGIN{IGNORECASE=1} /^cache-control:/ {sub(/^cache-control:[[:space:]]*/, ""); sub(/\r$/, ""); value=$0} END{print value}' "$headers")"
-  [[ "$cache_control" == *"max-age=0"* && "$cache_control" == *"must-revalidate"* ]] || {
-    echo "${path} is still browser-cacheable without revalidation: ${cache_control}" >&2
-    exit 1
-  }
-
   [[ -s "$body" ]] || {
     echo "${path} returned an empty body." >&2
     exit 1
   }
-done
 
-curl --fail --silent --show-error --location --compressed \
-  "${origin}/" > "$work/index.html"
-for reference in \
-  "/vendor/visual-language/theme.css?v=${release}" \
-  "/page.css?v=${release}" \
-  "/public-shell.css?v=${release}" \
-  "/visual-refresh.css?v=${release}" \
-  "/theme-toggle.js?v=${release}" \
-  "/gallery.js?v=${release}"; do
-  grep -Fq "$reference" "$work/index.html" || {
-    echo "The live page does not reference ${reference}." >&2
+  local_hash="$(sha256sum "$local_path" | awk '{print $1}')"
+  remote_hash="$(sha256sum "$body" | awk '{print $1}')"
+  [[ "$remote_hash" == "$local_hash" ]] || {
+    echo "${path} did not return the bytes deployed from ${local_path}." >&2
+    echo "local=${local_hash} remote=${remote_hash}" >&2
     exit 1
   }
 done
 
-echo "Verified cache-safe Packages assets at ${origin}."
+for reference in \
+  "/vendor/visual-language/hara-logo.svg?v=${version}" \
+  "/vendor/visual-language/theme.css?v=${version}" \
+  "/page.css?v=${version}" \
+  "/public-shell.css?v=${version}" \
+  "/visual-refresh.css?v=${version}" \
+  "/theme-toggle.js?v=${version}" \
+  "/gallery.js?v=${version}"; do
+  grep -Fq "$reference" "$work/_.body" || {
+    echo "The live page does not reference ${reference}." >&2
+    exit 1
+  }
+done
+grep -Fq "tokens.css?v=${version}" "$work/_vendor_visual-language_theme.css.body"
+grep -Fq "theme.js?v=${version}" "$work/_theme-toggle.js.body"
+grep -Fq "gallery.json?v=\${ASSET_VERSION}" "$work/_gallery.js.body"
+grep -Fq "const ASSET_VERSION = \"${version}\";" "$work/_gallery.js.body"
+
+echo "Verified commit-addressed Packages assets at ${origin} for ${version}."
