@@ -37,7 +37,7 @@ test("the gallery maps its workbench onto frost, graphite and one signal colour"
 });
 
 test("theme and accessibility behaviour stay shared with the Hara domain", () => {
-  assert.match(theme, /@import "\.\/tokens\.css"/);
+  assert.match(theme, /@import "\.\/tokens\.css\?v=20260809-1"/);
   assert.match(theme, /:focus-visible/);
   assert.match(theme, /prefers-reduced-motion/);
   assert.match(themeScript, /Domain=hara-lang\.org/);

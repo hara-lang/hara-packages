@@ -1,4 +1,4 @@
-@import "./tokens.css";
+@import "./tokens.css?v=20260809-1";
 
 html { background: var(--hara-bg); }
 body {

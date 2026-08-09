@@ -271,7 +271,7 @@ try {
   assert.equal(await page.locator(".demo-story").count(), 1);
 
   const emptyPage = await context.newPage();
-  await emptyPage.route("**/gallery.json", (route) => route.fulfill({
+  await emptyPage.route("**/gallery.json*", (route) => route.fulfill({
     status: 200,
     contentType: "application/json",
     body: JSON.stringify({ format: 1, registry: "hara", packages: [] }),
