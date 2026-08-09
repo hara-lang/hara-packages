@@ -1,4 +1,5 @@
 const GALLERY_FORMAT = 1;
+const ASSET_VERSION = "20260809-1";
 const SHOWCASE_PROTOCOL_VERSION = 1;
 const SELECT_SURFACE = "hara.showcase/select-surface";
 const READY = "hara.showcase/ready";
@@ -317,7 +318,7 @@ class PackageGallery {
     this.showSpecial(null);
     this.elements.runtimeStatus.textContent = "Loading reviewed Gallery index";
     try {
-      const response = await fetch("./gallery.json", { cache: "no-store", headers: { Accept: "application/json" } });
+      const response = await fetch(`./gallery.json?v=${ASSET_VERSION}`, { cache: "no-store", headers: { Accept: "application/json" } });
       if (!response.ok) throw new Error(`Gallery index request failed (${response.status})`);
       this.index = validIndex(await response.json());
       const count = galleryStoryCount(this.index);

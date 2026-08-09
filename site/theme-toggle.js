@@ -1,4 +1,4 @@
-import { cycleTheme, getThemePreference } from "./vendor/visual-language/theme.js";
+import { cycleTheme, getThemePreference } from "./vendor/visual-language/theme.js?v=20260809-1";
 
 const labels = { system: "System", light: "Light", dark: "Dark" };
 const icons = { system: "◐", light: "☼", dark: "●" };
