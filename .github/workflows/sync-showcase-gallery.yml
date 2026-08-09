@@ -1,0 +1,35 @@
+name: Sync Showcase Gallery publication branch
+
+on:
+  push:
+    branches:
+      - agent/publish-hodos-alumbra-supersonic-showcases
+    paths:
+      - "packages/**"
+      - ".github/workflows/sync-showcase-gallery.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm run gallery:build
+      - name: Commit generated Gallery index
+        run: |
+          if git diff --quiet -- site/gallery.json; then
+            echo "Gallery index already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/gallery.json
+          git commit -m "Generate Showcase Gallery index"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
