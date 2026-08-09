@@ -4,15 +4,20 @@
  :showcase/version "0.1.0"
  :showcase/title "Hodos Dev UI hosts"
  :showcase/summary
- "Trusted visible Explorer, Editor, Preview and REPL adapters driven by serializable Hodos Dev models."
+ "Trusted visible Catalog, Explorer, Editor, Preview, REPL, Problems, Value Inspector and Execution adapters driven by serializable Hodos Dev models."
  :showcase/source
  {:source/repository "greenways-ai/hodos"
   :source/branch "main"
-  :source/commit "bc03cd3f1d566c94f961c47cce9cd4850a39be29"
+  :source/commit "a9abd253d98afc7e257e8cf8bee67fbb916246f7"
   :source/root "packages/dev-ui"}
 
  :showcase/views
- [{:view/id :explorer-host
+ [{:view/id :catalog-host
+   :view/title "Catalog host"
+   :view/summary "A trusted descriptive Catalog host that emits only declared activity and tool requests."
+   :view/source "src/index.js"
+   :view/docs "README.md"}
+  {:view/id :explorer-host
    :view/title "Explorer host"
    :view/summary "A visible workspace-entry host with deterministic model updates and disposal."
    :view/source "src/index.js"
@@ -31,10 +36,29 @@
    :view/title "REPL host"
    :view/summary "A visible session console emitting only declared semantic events."
    :view/source "src/index.js"
+   :view/docs "README.md"}
+  {:view/id :problems-host
+   :view/title "Problems host"
+   :view/summary "A trusted diagnostic list, filtering and source-navigation adapter over bounded problem values."
+   :view/source "src/index.js"
+   :view/docs "README.md"}
+  {:view/id :value-inspector-host
+   :view/title "Value Inspector host"
+   :view/summary "A trusted tree and path adapter over serializable retained values."
+   :view/source "src/index.js"
+   :view/docs "README.md"}
+  {:view/id :execution-host
+   :view/title "Execution host"
+   :view/summary "A bounded evidence renderer emitting semantic execution and editor-selection requests."
+   :view/source "src/index.js"
    :view/docs "README.md"}]
 
  :showcase/states
- [{:state/id :explorer-host/project
+ [{:state/id :catalog-host/activity
+   :state/title "Catalog host lifecycle"
+   :state/summary "A visible activity selection with retained check evidence and semantic capabilities."
+   :state/file "showcase/states/catalog-host.edn"}
+  {:state/id :explorer-host/project
    :state/title "Explorer host lifecycle"
    :state/file "showcase/states/explorer-host.edn"}
   {:state/id :editor-host/live
@@ -45,10 +69,33 @@
    :state/file "showcase/states/preview-host.edn"}
   {:state/id :repl-host/ready
    :state/title "REPL host lifecycle"
-   :state/file "showcase/states/repl-host.edn"}]
+   :state/file "showcase/states/repl-host.edn"}
+  {:state/id :problems-host/source
+   :state/title "Problems host lifecycle"
+   :state/summary "A selected source problem, active filter and host disposal boundary."
+   :state/file "showcase/states/problems-host.edn"}
+  {:state/id :value-inspector-host/nested
+   :state/title "Value Inspector host lifecycle"
+   :state/summary "A nested retained value with explicit selected and expanded paths."
+   :state/file "showcase/states/value-inspector-host.edn"}
+  {:state/id :execution-host/returned
+   :state/title "Execution host lifecycle"
+   :state/summary "Checked-in result-7 evidence, semantic controls, source selection and disposal."
+   :state/file "showcase/states/execution-host.edn"}]
 
  :showcase/demos
- [{:demo/id :explorer-host/project
+ [{:demo/id :catalog-host/activity
+   :demo/title "Visible activity Catalog"
+   :demo/summary "Exercise the trusted Catalog host with descriptive tools, selected activity and bounded check evidence."
+   :demo/view :catalog-host
+   :demo/state :catalog-host/activity
+   :demo/project "showcase/catalog-host"
+   :demo/surface :catalog
+   :demo/docs "showcase/catalog-host/README.md"
+   :demo/tags ["catalog" "dom" "activities"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1100 :viewport/height 720}}
+  {:demo/id :explorer-host/project
    :demo/title "Visible project Explorer"
    :demo/summary "Exercise the Playground's trusted Hodos Explorer integration on an immutable project."
    :demo/view :explorer-host
@@ -92,4 +139,48 @@
    :demo/docs "showcase/repl-host/README.md"
    :demo/tags ["repl" "console" "session"]
    :demo/theme :dark
-   :demo/viewport {:viewport/width 900 :viewport/height 620}}]}
+   :demo/viewport {:viewport/width 900 :viewport/height 620}}
+  {:demo/id :problems-host/source
+   :demo/title "Visible Problems host"
+   :demo/summary "Filter and select structured diagnostics through the trusted host without transferring source authority."
+   :demo/view :problems-host
+   :demo/state :problems-host/source
+   :demo/project "showcase/problems-host"
+   :demo/surface :problems
+   :demo/docs "showcase/problems-host/README.md"
+   :demo/tags ["problems" "dom" "source-navigation"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1100 :viewport/height 720}}
+  {:demo/id :value-inspector-host/nested
+   :demo/title "Visible Value Inspector"
+   :demo/summary "Navigate a nested serializable value through the trusted host and closed semantic events."
+   :demo/view :value-inspector-host
+   :demo/state :value-inspector-host/nested
+   :demo/project "showcase/value-inspector-host"
+   :demo/surface :value
+   :demo/docs "showcase/value-inspector-host/README.md"
+   :demo/tags ["value" "dom" "tree"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1000 :viewport/height 680}}
+  {:demo/id :execution-host/returned
+   :demo/title "Visible returned Execution"
+   :demo/summary "Render immutable result-7 evidence and exercise semantic controls and source selection."
+   :demo/view :execution-host
+   :demo/state :execution-host/returned
+   :demo/project "showcase/execution-host"
+   :demo/surface :execution
+   :demo/docs "showcase/execution-host/README.md"
+   :demo/tags ["execution" "dom" "result-7"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1100 :viewport/height 720}}
+  {:demo/id :execution-host/compact
+   :demo/title "Visible compact Execution"
+   :demo/summary "Use the shipped responsive host at phone width without a second renderer."
+   :demo/view :execution-host
+   :demo/state :execution-host/returned
+   :demo/project "showcase/execution-host"
+   :demo/surface :execution
+   :demo/docs "showcase/execution-host/README.md"
+   :demo/tags ["execution" "compact" "responsive"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 520 :viewport/height 760}}]}
