@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
-const [page, theme, toggle, gallery, config, verifier, packageJson, versioner] = await Promise.all([
+const [page, theme, toggle, gallery, config, verifier, packageJson, versioner, browserVerifier] = await Promise.all([
   read("../site/index.html"),
   read("../site/vendor/visual-language/theme.css"),
   read("../site/theme-toggle.js"),
@@ -12,6 +12,7 @@ const [page, theme, toggle, gallery, config, verifier, packageJson, versioner] =
   read("../.github/scripts/verify-static-assets.sh"),
   read("../package.json"),
   read("../scripts/version-site-assets.mjs"),
+  read("../scripts/verify-gallery-browser.mjs"),
 ]);
 
 const release = "20260809-1";
@@ -64,4 +65,8 @@ test("the deployment versioner and live verifier prove exact public bytes", () =
   assert.match(verifier, /did not return the bytes deployed/);
   assert.match(verifier, /Verified commit-addressed Packages assets/);
   assert.doesNotMatch(verifier, /max-age=0.*exit 1/s);
+});
+
+test("the Chromium empty-state fixture accepts the versioned Gallery index URL", () => {
+  assert.match(browserVerifier, /emptyPage\.route\("\*\*\/gallery\.json\*"/);
 });
