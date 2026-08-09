@@ -4,7 +4,7 @@
  :package/version "0.1.0"
  :source/repository "greenways-ai/hodos"
  :source/branch "main"
- :source/commit "bc03cd3f1d566c94f961c47cce9cd4850a39be29"
+ :source/commit "a9abd253d98afc7e257e8cf8bee67fbb916246f7"
  :source/root "packages/dev"
  :registry/channel :testing
  :registry/status :preview
