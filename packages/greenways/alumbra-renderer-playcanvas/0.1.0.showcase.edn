@@ -1,0 +1,36 @@
+{:hara/type :showcase
+ :showcase/format 1
+ :showcase/package :greenways/alumbra-renderer-playcanvas
+ :showcase/version "0.1.0"
+ :showcase/title "PlayCanvas Renderer"
+ :showcase/summary
+ "Voxel meshing, material grouping and picking projected from canonical Alumbra chunks."
+ :showcase/source
+ {:source/repository "greenways-ai/alumbra"
+  :source/branch "main"
+  :source/commit "e4745bd01d68c30e6c2502774285922f2adb1677"
+  :source/root "packages/renderer-playcanvas"}
+
+ :showcase/views
+ [{:view/id :greedy-meshing
+   :view/title "Greedy meshing"
+   :view/summary "Compare a canonical voxel fixture with bounded quad and material-group evidence."}]
+
+ :showcase/states
+ [{:state/id :mesh/single-chunk
+   :state/title "Single meshed chunk"
+   :state/summary "A bounded render-evidence fixture for one canonical chunk revision."
+   :state/file "showcase/states/greedy-meshing.edn"}]
+
+ :showcase/demos
+ [{:demo/id :greedy-meshing
+   :demo/title "Greedy meshing"
+   :demo/summary "Compare a canonical voxel fixture with bounded quad and material-group evidence."
+   :demo/view :greedy-meshing
+   :demo/state :mesh/single-chunk
+   :demo/project "showcase/greedy-meshing"
+   :demo/surface :viewport
+   :demo/docs "showcase/greedy-meshing/README.md"
+   :demo/tags ["meshing" "playcanvas" "level:renderer" "checks:3"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1180 :viewport/height 760}}]}
