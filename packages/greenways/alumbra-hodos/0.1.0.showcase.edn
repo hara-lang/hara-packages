@@ -1,0 +1,37 @@
+{:hara/type :showcase
+ :showcase/format 1
+ :showcase/package :greenways/alumbra-hodos
+ :showcase/version "0.1.0"
+ :showcase/title "Hodos Integration"
+ :showcase/summary
+ "Trusted Catalog and viewport adapters that keep demo selection separate from engine authority."
+ :showcase/source
+ {:source/repository "greenways-ai/alumbra"
+  :source/branch "main"
+  :source/commit "e4745bd01d68c30e6c2502774285922f2adb1677"
+  :source/root "packages/hodos"}
+
+ :showcase/views
+ [{:view/id :renderer-catalog
+   :view/title "Renderer Catalog"
+   :view/summary "Open the installed playable laboratory by semantic activity identity beside its bounded Catalog projection."}]
+
+ :showcase/states
+ [{:state/id :catalog/playable-lab
+   :state/title "Playable lab selected"
+   :state/summary "The renderer Catalog points at the installed playable lab without exposing its project path."
+   :state/file "showcase/states/renderer-catalog.edn"}]
+
+ :showcase/demos
+ [{:demo/id :renderer-catalog
+   :demo/title "Playable renderer Catalog"
+   :demo/summary "Open the installed playable laboratory by semantic activity identity beside its bounded Catalog projection."
+   :demo/view :renderer-catalog
+   :demo/state :catalog/playable-lab
+   :demo/project "showcase/renderer-catalog"
+   :demo/surface :viewport
+   :demo/docs "showcase/renderer-catalog/README.md"
+   :demo/tags ["catalog" "workspace" "playable-lab" "level:integration" "checks:4"]
+   :demo/theme :dark
+   :demo/viewport {:viewport/width 1180 :viewport/height 760}
+   :demo/default true}]}
