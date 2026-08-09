@@ -1,0 +1,12 @@
+{:hara/type :package-release-preview
+ :release/format 1
+ :package/name :greenways/supersonic
+ :package/version "0.1.0"
+ :source/repository "hara-lang/hara"
+ :source/branch "main"
+ :source/commit "10dab3f952a424bba37e8bcd1b1c3270455a850a"
+ :source/root "contrib/greenways/supersonic"
+ :registry/channel :testing
+ :registry/status :preview
+ :registry/note
+ "Unsigned testing Gallery preview. This record is not an installable or production Hara package release."}
