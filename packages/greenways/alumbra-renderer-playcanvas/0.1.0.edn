@@ -1,0 +1,12 @@
+{:hara/type :package-release-preview
+ :release/format 1
+ :package/name :greenways/alumbra-renderer-playcanvas
+ :package/version "0.1.0"
+ :source/repository "greenways-ai/alumbra"
+ :source/branch "main"
+ :source/commit "e4745bd01d68c30e6c2502774285922f2adb1677"
+ :source/root "packages/renderer-playcanvas"
+ :registry/channel :testing
+ :registry/status :preview
+ :registry/note
+ "Unsigned testing Gallery preview. This record is not an installable or production Hara package release."}
