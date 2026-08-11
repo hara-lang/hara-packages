@@ -2,11 +2,8 @@ name: Deploy packages.hara-lang.org
 
 on:
   push:
-    branches: [main, production]
+    branches: [main, testing]
     paths: [site/**, packages/**, requests/**, registry.edn, src/**, scripts/**, netlify/**, netlify.toml, test/**, package.json, .github/scripts/**, .github/workflows/pages.yml]
-  pull_request:
-    branches: [main, production]
-    types: [closed]
   workflow_dispatch:
 
 permissions:
@@ -18,10 +15,6 @@ concurrency:
 
 jobs:
   deploy:
-    if: >-
-      github.event_name != 'pull_request' ||
-      (github.event.pull_request.merged == true &&
-      startsWith(github.event.pull_request.title, '[deploy]'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -53,68 +46,52 @@ jobs:
           fi
       - name: Version deployed static assets
         run: npm run assets:version -- "$GITHUB_SHA"
-      - name: Deploy main to packages.testing.hara-lang.org
-        if: >-
-          (github.event_name != 'pull_request' && github.ref_name == 'main') ||
-          (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main')
-        run: npx --yes netlify-cli deploy --prod --dir site --message "main ${GITHUB_SHA}"
+      - name: Deploy testing to packages.testing.hara-lang.org
+        if: github.ref_name == 'testing'
+        run: npx --yes netlify-cli deploy --prod --dir site --message "testing ${GITHUB_SHA}"
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_TESTING_SITE_ID }}
       - name: Reconcile packages.testing.hara-lang.org
-        if: >-
-          (github.event_name != 'pull_request' && github.ref_name == 'main') ||
-          (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main')
+        if: github.ref_name == 'testing'
         run: bash .github/scripts/reconcile-netlify-domain.sh
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_TESTING_SITE_ID }}
           NETLIFY_CUSTOM_DOMAIN: packages.testing.hara-lang.org
       - name: Verify testing static assets
-        if: >-
-          (github.event_name != 'pull_request' && github.ref_name == 'main') ||
-          (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main')
+        if: github.ref_name == 'testing'
         run: bash .github/scripts/verify-static-assets.sh
         env:
           HARA_SITE_ORIGIN: https://packages.testing.hara-lang.org
           HARA_ASSET_VERSION: ${{ github.sha }}
       - name: Verify testing shared identity
-        if: >-
-          (github.event_name != 'pull_request' && github.ref_name == 'main') ||
-          (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main')
+        if: github.ref_name == 'testing'
         run: bash .github/scripts/verify-shared-identity.sh
         env:
           HARA_SITE_ORIGIN: https://packages.testing.hara-lang.org
           HARA_IDENTITY_ORIGIN: https://id.testing.hara-lang.org
-      - name: Deploy production to packages.hara-lang.org
-        if: >-
-          (github.event_name != 'pull_request' && github.ref_name == 'production') ||
-          (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'production')
-        run: npx --yes netlify-cli deploy --prod --dir site --message "production ${GITHUB_SHA}"
+      - name: Deploy main to packages.hara-lang.org
+        if: github.ref_name == 'main'
+        run: npx --yes netlify-cli deploy --prod --dir site --message "main ${GITHUB_SHA}"
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_PRODUCTION_SITE_ID }}
       - name: Reconcile packages.hara-lang.org
-        if: >-
-          (github.event_name != 'pull_request' && github.ref_name == 'production') ||
-          (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'production')
+        if: github.ref_name == 'main'
         run: bash .github/scripts/reconcile-netlify-domain.sh
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_PRODUCTION_SITE_ID }}
           NETLIFY_CUSTOM_DOMAIN: packages.hara-lang.org
       - name: Verify production static assets
-        if: >-
-          (github.event_name != 'pull_request' && github.ref_name == 'production') ||
-          (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'production')
+        if: github.ref_name == 'main'
         run: bash .github/scripts/verify-static-assets.sh
         env:
           HARA_SITE_ORIGIN: https://packages.hara-lang.org
           HARA_ASSET_VERSION: ${{ github.sha }}
       - name: Verify production shared identity
-        if: >-
-          (github.event_name != 'pull_request' && github.ref_name == 'production') ||
-          (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'production')
+        if: github.ref_name == 'main'
         run: bash .github/scripts/verify-shared-identity.sh
         env:
           HARA_SITE_ORIGIN: https://packages.hara-lang.org

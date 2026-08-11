@@ -17,7 +17,7 @@ on:
       - "README.md"
       - ".github/workflows/validate.yml"
   push:
-    branches: [main]
+    branches: [main, testing]
     paths:
       - "site/**"
       - "packages/**"

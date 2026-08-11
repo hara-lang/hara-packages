@@ -14,7 +14,7 @@ on:
       - "test/showcase*.test.mjs"
       - "package.json"
   push:
-    branches: [main, production]
+    branches: [main, testing]
     paths:
       - ".github/workflows/gallery-browser.yml"
       - "packages/**"
