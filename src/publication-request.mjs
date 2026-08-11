@@ -1,7 +1,7 @@
 import { EdnKeyword, readEdnData } from "./edn.mjs";
 import { normalizeRegistryPath } from "./showcase.mjs";
 
-export const PUBLICATION_REQUEST_FORMAT = 1;
+export const PUBLICATION_REQUEST_FORMAT = "0.0.0-alpha";
 export const PUBLICATION_REQUEST_SUFFIX = ".edn";
 
 const PACKAGE_ID = /^[a-z][a-z0-9.-]{0,62}\/[a-z][a-z0-9._-]{0,62}$/;
@@ -205,7 +205,7 @@ export function normalizePublicationRequest(value, {
   if (type !== "package-publication-request") {
     throw new Error(`Expected :hara/type :package-publication-request, received :${type}`);
   }
-  const format = Number(request["request/format"]);
+  const format = request["request/format"];
   if (format !== PUBLICATION_REQUEST_FORMAT) throw new Error(`Unsupported publication request format: ${request["request/format"]}`);
   const packageRecord = normalizePackage(request["request/package"]);
   if (expectedPackage && packageRecord.name !== expectedPackage) {

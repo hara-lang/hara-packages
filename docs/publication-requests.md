@@ -11,7 +11,7 @@ requests/<owner>/<name>/<version>.edn
 
 ```clojure
 {:hara/type :package-publication-request
- :request/format 1
+ :request/format "0.0.0-alpha"
 
  :request/package
  {:package/name :greenways/hodos-2d
@@ -65,7 +65,7 @@ A source package can keep this beside `project.edn`:
 
 ```clojure
 {:hara/type :showcase
- :showcase/format 1
+ :showcase/format "0.0.0-alpha"
  :showcase/package :greenways/hodos-2d
  :showcase/version "0.1.0"
  :showcase/title "Hodos 2D"

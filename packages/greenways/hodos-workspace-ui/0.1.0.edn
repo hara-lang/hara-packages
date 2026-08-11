@@ -1,5 +1,5 @@
 {:hara/type :package-release-preview
- :release/format 1
+ :release/format "0.0.0-alpha"
  :package/name :greenways/hodos-workspace-ui
  :package/version "0.1.0"
  :source/repository "greenways-ai/hodos"

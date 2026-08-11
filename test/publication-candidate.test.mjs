@@ -9,7 +9,7 @@ import {
 const COMMIT = "a".repeat(40);
 const SHOWCASE = `
 {:hara/type :showcase
- :showcase/format 1
+ :showcase/format \"0.0.0-alpha\"
  :showcase/package :greenways/hodos-2d
  :showcase/version "0.1.0"
  :showcase/title "Hodos 2D"

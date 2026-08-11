@@ -1,5 +1,5 @@
 {:hara/type :showcase
- :showcase/format 1
+ :showcase/format "0.0.0-alpha"
  :showcase/package :greenways/supersonic
  :showcase/version "0.1.0"
  :showcase/title "Supersonic"

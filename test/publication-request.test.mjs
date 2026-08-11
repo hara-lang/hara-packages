@@ -10,7 +10,7 @@ const DIGEST = "b".repeat(64);
 
 function request(overrides = "") {
   return `{:hara/type :package-publication-request
- :request/format 1
+ :request/format \"0.0.0-alpha\"
  :request/package
  {:package/name :hara/example
   :package/version "0.1.0"

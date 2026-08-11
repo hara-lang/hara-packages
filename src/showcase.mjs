@@ -1,6 +1,6 @@
 import { EdnKeyword, readEdnData } from "./edn.mjs";
 
-export const SHOWCASE_FORMAT = 1;
+export const SHOWCASE_FORMAT = "0.0.0-alpha";
 export const SHOWCASE_SIDECAR_SUFFIX = ".showcase.edn";
 
 const IDENTIFIER = /^[A-Za-z0-9](?:[A-Za-z0-9._/-]{0,126}[A-Za-z0-9])?$/;
@@ -283,7 +283,7 @@ export function normalizeShowcaseManifest(value, {
   knownKeys(manifest, TOP_KEYS, "Showcase manifest");
   const type = token(manifest["hara/type"], "Showcase manifest :hara/type");
   if (type !== "showcase") throw new Error(`Expected :hara/type :showcase, received :${type}`);
-  const format = Number(manifest["showcase/format"]);
+  const format = manifest["showcase/format"];
   if (format !== SHOWCASE_FORMAT) throw new Error(`Unsupported Showcase format: ${manifest["showcase/format"]}`);
   const packageId = token(manifest["showcase/package"], "Showcase package");
   if (!PACKAGE_ID.test(packageId)) throw new TypeError("Showcase package must use lowercase owner/name form");

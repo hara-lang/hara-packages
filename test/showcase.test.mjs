@@ -10,7 +10,7 @@ import { parseShowcaseManifest } from "../src/showcase.mjs";
 const COMMIT = "a".repeat(40);
 const VALID = `
 {:hara/type :showcase
- :showcase/format 1
+ :showcase/format \"0.0.0-alpha\"
  :showcase/package :hara/example
  :showcase/version "0.1.0"
  :showcase/title "Example UI"
@@ -106,7 +106,7 @@ test("Gallery builder requires finalized release siblings and emits a determinis
     await writeFile(join(directory, "0.1.0.edn"), '{:release/package :hara/example :release/version "0.1.0"}\n');
     await writeFile(join(directory, "0.1.0.showcase.edn"), VALID);
     const index = await buildGalleryIndex({ root });
-    assert.equal(index.format, 1);
+    assert.equal(index.format, "0.0.0-alpha");
     assert.equal(index.registry, "hara");
     assert.equal(index.packages.length, 1);
     assert.equal(index.packages[0].id, "hara/example");

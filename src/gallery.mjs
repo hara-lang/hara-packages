@@ -84,7 +84,7 @@ export async function buildGalleryIndex({
       || right.version.localeCompare(left.version));
 
   return {
-    format: 1,
+    format: "0.0.0-alpha",
     registry: "hara",
     packages: packageGroups(showcases),
   };

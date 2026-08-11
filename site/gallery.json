@@ -1,12 +1,12 @@
 {
-  "format": 1,
+  "format": "0.0.0-alpha",
   "registry": "hara",
   "packages": [
     {
       "id": "greenways/alumbra-core",
       "versions": [
         {
-          "format": 1,
+          "format": "0.0.0-alpha",
           "package": "greenways/alumbra-core",
           "version": "0.1.0",
           "title": "Core",
@@ -102,7 +102,7 @@
       "id": "greenways/alumbra-engine",
       "versions": [
         {
-          "format": 1,
+          "format": "0.0.0-alpha",
           "package": "greenways/alumbra-engine",
           "version": "0.1.0",
           "title": "Engine",
@@ -199,7 +199,7 @@
       "id": "greenways/alumbra-hara",
       "versions": [
         {
-          "format": 1,
+          "format": "0.0.0-alpha",
           "package": "greenways/alumbra-hara",
           "version": "0.1.0",
           "title": "Portable Rules",
@@ -258,7 +258,7 @@
       "id": "greenways/alumbra-history",
       "versions": [
         {
-          "format": 1,
+          "format": "0.0.0-alpha",
           "package": "greenways/alumbra-history",
           "version": "0.1.0",
           "title": "History",
@@ -322,7 +322,7 @@
       "id": "greenways/alumbra-history-store",
       "versions": [
         {
-          "format": 1,
+          "format": "0.0.0-alpha",
           "package": "greenways/alumbra-history-store",
           "version": "0.1.0",
           "title": "History Store",
@@ -386,7 +386,7 @@
       "id": "greenways/alumbra-hodos",
       "versions": [
         {
-          "format": 1,
+          "format": "0.0.0-alpha",
           "package": "greenways/alumbra-hodos",
           "version": "0.1.0",
           "title": "Hodos Integration",
@@ -446,7 +446,7 @@
       "id": "greenways/alumbra-renderer-playcanvas",
       "versions": [
         {
-          "format": 1,
+          "format": "0.0.0-alpha",
           "package": "greenways/alumbra-renderer-playcanvas",
           "version": "0.1.0",
           "title": "PlayCanvas Renderer",
@@ -505,7 +505,7 @@
       "id": "greenways/hodos-2d",
       "versions": [
         {
-          "format": 1,
+          "format": "0.0.0-alpha",
           "package": "greenways/hodos-2d",
           "version": "0.1.0",
           "title": "Hodos 2D models",
@@ -600,7 +600,7 @@
       "id": "greenways/hodos-2d-ui",
       "versions": [
         {
-          "format": 1,
+          "format": "0.0.0-alpha",
           "package": "greenways/hodos-2d-ui",
           "version": "0.1.0",
           "title": "Hodos 2D UI hosts",
@@ -695,7 +695,7 @@
       "id": "greenways/hodos-dev",
       "versions": [
         {
-          "format": 1,
+          "format": "0.0.0-alpha",
           "package": "greenways/hodos-dev",
           "version": "0.1.0",
           "title": "Hodos Dev models",
@@ -1064,7 +1064,7 @@
       "id": "greenways/hodos-dev-ui",
       "versions": [
         {
-          "format": 1,
+          "format": "0.0.0-alpha",
           "package": "greenways/hodos-dev-ui",
           "version": "0.1.0",
           "title": "Hodos Dev UI hosts",
@@ -1387,7 +1387,7 @@
       "id": "greenways/hodos-workspace-ui",
       "versions": [
         {
-          "format": 1,
+          "format": "0.0.0-alpha",
           "package": "greenways/hodos-workspace-ui",
           "version": "0.1.0",
           "title": "Hodos Workspace UI",
@@ -1475,7 +1475,7 @@
       "id": "greenways/supersonic",
       "versions": [
         {
-          "format": 1,
+          "format": "0.0.0-alpha",
           "package": "greenways/supersonic",
           "version": "0.1.0",
           "title": "Supersonic",

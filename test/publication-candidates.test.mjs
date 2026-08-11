@@ -16,7 +16,7 @@ const DIGEST = "b".repeat(64);
 function request(packageId, version, sourceRoot) {
   const [owner, name] = packageId.split("/");
   return `{:hara/type :package-publication-request
- :request/format 1
+ :request/format \"0.0.0-alpha\"
  :request/package
  {:package/name :${packageId}
   :package/version "${version}"
@@ -72,7 +72,7 @@ test("builds and sorts deterministic candidate projections from request files", 
       },
     });
     assert.equal(fetched, false);
-    assert.equal(index.format, 1);
+    assert.equal(index.format, "0.0.0-alpha");
     assert.equal(index.registry, "hara");
     assert.deepEqual(index.candidates.map((candidate) => candidate.package), [
       "alpha/cards",

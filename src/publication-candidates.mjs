@@ -67,7 +67,7 @@ export async function buildPublicationCandidateIndex({
     }));
   }
   return {
-    format: 1,
+    format: "0.0.0-alpha",
     registry: "hara",
     candidates: candidates.sort((left, right) =>
       left.package.localeCompare(right.package)

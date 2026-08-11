@@ -1,5 +1,5 @@
 {:hara/type :showcase
- :showcase/format 1
+ :showcase/format "0.0.0-alpha"
  :showcase/package :greenways/hodos-2d-ui
  :showcase/version "0.1.0"
  :showcase/title "Hodos 2D UI hosts"

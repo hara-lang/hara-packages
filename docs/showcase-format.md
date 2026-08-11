@@ -17,7 +17,7 @@ path traversal, broken references and mutable source identities.
 
 ```clojure
 {:hara/type :showcase
- :showcase/format 1
+ :showcase/format "0.0.0-alpha"
  :showcase/package :hara/example
  :showcase/version "0.1.0"
  :showcase/title "Example UI"
@@ -64,7 +64,7 @@ source-local form uses the same fields except `:showcase/source`:
 
 ```clojure
 {:hara/type :showcase
- :showcase/format 1
+ :showcase/format "0.0.0-alpha"
  :showcase/package :hara/example
  :showcase/version "0.1.0"
  :showcase/title "Example UI"

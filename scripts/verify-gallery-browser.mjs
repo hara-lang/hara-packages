@@ -13,12 +13,12 @@ let browser = null;
 let server = null;
 
 const gallery = {
-  format: 1,
+  format: "0.0.0-alpha",
   registry: "hara",
   packages: [{
     id: "hara/example",
     versions: [{
-      format: 1,
+      format: "0.0.0-alpha",
       package: "hara/example",
       version: "0.1.0",
       title: "Example UI",
@@ -162,7 +162,7 @@ try {
   browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
   let identityClientRequests = 0;
-  await context.route("https://id.hara-lang.org/v1/identity-client.js", async (route) => {
+  await context.route("https://id.hara-lang.org/0-alpha/identity-client.js", async (route) => {
     identityClientRequests += 1;
     await route.fulfill({
       status: 200,
@@ -274,7 +274,7 @@ try {
   await emptyPage.route("**/gallery.json*", (route) => route.fulfill({
     status: 200,
     contentType: "application/json",
-    body: JSON.stringify({ format: 1, registry: "hara", packages: [] }),
+    body: JSON.stringify({ format: "0.0.0-alpha", registry: "hara", packages: [] }),
   }));
   await emptyPage.goto(origin, { waitUntil: "domcontentloaded", timeout: 15_000 });
   await emptyPage.waitForSelector('[data-hara-identity][data-state="fixture-signed-out"]', { timeout: 10_000 });
