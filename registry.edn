@@ -3,4 +3,10 @@
  :registry/identity {:repository "github:hara-lang/hara-identity"
                      :branch "main"}
  :registry/packages-root "packages"
- :registry/requests-root "requests"}
+ :registry/requests-root "requests"
+
+ ;; Commit-pinned clients use these deterministic projections for package and
+ ;; unloaded-namespace discovery. Only finalized, attested release records are
+ ;; eligible; the current preview records intentionally contribute nothing.
+ :registry/packages {}
+ :registry/namespaces {}}

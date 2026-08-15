@@ -33,6 +33,13 @@ intent, registry validation, and review.
   validation.
 - `site/` — generated/static package browser deployed through Netlify.
 
+The commit-pinned `registry.edn` also carries deterministic
+`:registry/packages` and `:registry/namespaces` projections. Runtime clients use
+those projections to discover locked namespaces without loading them, then
+download the selected immutable archive through
+`/objects/sha256/<archive-digest>`. Preview and candidate records never enter
+either projection.
+
 ## Package Showcases
 
 A source package may keep a closed declarative `showcase.edn` beside its

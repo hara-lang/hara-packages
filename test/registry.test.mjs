@@ -54,6 +54,13 @@ test("registry document streams the Git source with authority headers", async ()
   });
 });
 
+test("the authoritative registry document exposes package and namespace projections", async () => {
+  const source = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../registry.edn", import.meta.url), "utf8"));
+  assert.match(source, /:registry\/packages\s+\{\}/);
+  assert.match(source, /:registry\/namespaces\s+\{\}/);
+  assert.doesNotMatch(source, /package-release-preview[\s\S]*:registry\/namespaces/);
+});
+
 test("commit-pinned registry reads are immutable and long-cached", async () => {
   await withFetch(async () => ednBody(), async () => {
     const response = await handler(request(`/v1/registry?ref=${"b".repeat(40)}`));
