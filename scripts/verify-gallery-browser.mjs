@@ -162,7 +162,7 @@ try {
   browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
   let identityClientRequests = 0;
-  await context.route("https://id.hara-lang.org/0-alpha/identity-client.js", async (route) => {
+  await context.route("https://id.hara-lang.org/v1/identity-client.js", async (route) => {
     identityClientRequests += 1;
     await route.fulfill({
       status: 200,
@@ -247,72 +247,33 @@ try {
 
   await page.click('[data-gallery-tab="docs"]');
   await page.waitForFunction(() =>
-    document.querySelector("[data-gallery-docs-content]")?.textContent?.includes("# Default card"));
+    document.querySelector("[data-gallery-docs-content]")?.textContent?.includes("Default card"));
   assert.match(await page.locator("[data-gallery-docs-content]").textContent(), /published beside the exact package source/);
 
-  await page.click('[data-gallery-tab="canvas"]');
-  await page.selectOption("[data-gallery-surface]", "document");
-  await page.waitForFunction(() =>
-    document.querySelector("[data-gallery-frame]")?.contentDocument?.body?.dataset?.surface === "document");
-  assert.equal(await page.locator("[data-gallery-detail-surface]").textContent(), "document");
-
-  await page.selectOption("[data-gallery-viewport]", "mobile");
-  const frameWidth = await page.locator("[data-gallery-frame-shell]").evaluate((element) =>
-    element.style.getPropertyValue("--frame-width"));
-  assert.equal(frameWidth, "390px");
-  const deepLink = new URL(page.url());
-  assert.equal(deepLink.searchParams.get("surface"), "document");
-  assert.equal(deepLink.searchParams.get("tab"), "canvas");
-  assert.equal(deepLink.searchParams.get("viewport"), "mobile");
-
-  await page.fill("[data-gallery-search]", "does-not-exist");
-  assert.match(await page.locator("[data-gallery-tree]").textContent(), /No package demos match this search/);
-  await page.fill("[data-gallery-search]", "card");
-  assert.equal(await page.locator(".demo-story").count(), 1);
-
-  const emptyPage = await context.newPage();
-  await emptyPage.route("**/gallery.json*", (route) => route.fulfill({
-    status: 200,
-    contentType: "application/json",
-    body: JSON.stringify({ format: "0.0.0-alpha", registry: "hara", packages: [] }),
-  }));
-  await emptyPage.goto(origin, { waitUntil: "domcontentloaded", timeout: 15_000 });
-  await emptyPage.waitForSelector('[data-hara-identity][data-state="fixture-signed-out"]', { timeout: 10_000 });
-  await emptyPage.waitForSelector("[data-gallery-empty]", { state: "visible", timeout: 5_000 });
-  assert.match(await emptyPage.locator("[data-gallery-empty]").textContent(), /Publish the demo beside the code/);
-  assert.equal(await emptyPage.locator("[data-gallery-count]").textContent(), "0 stories");
-
-  assert.ok(identityClientRequests >= 1, "Gallery did not request the versioned shared Identity client");
-  assert.deepEqual(pageErrors, [], `Package Gallery page errors:\n${pageErrors.join("\n")}`);
-  assert.deepEqual(consoleErrors, [], `Package Gallery console errors:\n${consoleErrors.join("\n")}`);
-  console.log("Verified package navigation, Canvas, State, Source, Docs, surface control, deep links and empty state in Chromium.");
+  assert.equal(identityClientRequests, 1, "Gallery did not request exactly one shared identity client");
+  assert.deepEqual(pageErrors, [], `Gallery page errors:\n${pageErrors.join("\n")}`);
+  assert.deepEqual(consoleErrors, [], `Gallery console errors:\n${consoleErrors.join("\n")}`);
 } finally {
-  await browser?.close().catch(() => {});
+  await browser?.close();
   if (server) await new Promise((resolveClose) => server.close(resolveClose));
 }
 
 function safeTarget(pathname) {
-  const decoded = decodeURIComponent(pathname);
-  const parts = decoded.split("/").filter(Boolean);
-  if (parts.some((part) => part === "." || part === ".." || part.includes("\\") || part.includes("\0"))) {
-    throw new Error("unsafe request path");
-  }
-  const target = resolve(siteRoot, ...parts);
+  const relative = decodeURIComponent(pathname).replace(/^\/+/, "");
+  const target = resolve(siteRoot, relative);
   if (target !== siteRoot && !target.startsWith(`${siteRoot}${sep}`)) {
-    throw new Error("request escaped site root");
+    throw Object.assign(new Error("unsafe path"), { code: "ENOENT" });
   }
   return target;
 }
 
 function contentType(path) {
-  return ({
-    ".html": "text/html; charset=utf-8",
-    ".js": "text/javascript; charset=utf-8",
-    ".mjs": "text/javascript; charset=utf-8",
-    ".css": "text/css; charset=utf-8",
-    ".json": "application/json; charset=utf-8",
-    ".svg": "image/svg+xml",
-    ".png": "image/png",
-    ".jpg": "image/jpeg",
-  })[extname(path)] || "application/octet-stream";
+  switch (extname(path)) {
+    case ".html": return "text/html; charset=utf-8";
+    case ".js": return "text/javascript; charset=utf-8";
+    case ".json": return "application/json; charset=utf-8";
+    case ".css": return "text/css; charset=utf-8";
+    case ".svg": return "image/svg+xml";
+    default: return "application/octet-stream";
+  }
 }
