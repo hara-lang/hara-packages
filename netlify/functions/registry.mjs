@@ -3,6 +3,7 @@
 // of record is the Git repository; this origin only serves it.
 
 const COMMIT = /^[0-9a-f]{40}$/;
+const REGISTRY_REPOSITORY = "hara-lang/hara-packages";
 
 const DISCOVERY = '{:tap/name "hara" :tap/identity "https://id.hara-lang.org" :tap/registry "https://packages.hara-lang.org"}\n';
 
@@ -28,28 +29,53 @@ export function upstreamUrl(ref) {
   }
   // raw.githubusercontent.com is CDN-fronted; the api.github.com contents
   // endpoint rate-limits shared egress IPs and 502s in practice.
-  return `https://raw.githubusercontent.com/hara-lang/hara-packages/${ref}/registry.edn`;
+  return `https://raw.githubusercontent.com/${REGISTRY_REPOSITORY}/${ref}/registry.edn`;
 }
 
-async function registryDocument(url) {
-  const ref = url.searchParams.get("ref") ?? "main";
-  let upstream;
+export function commitUrl(ref) {
+  if (ref !== "main" && !COMMIT.test(ref)) {
+    throw new Error("ref must be main or a 40-character commit");
+  }
+  return `https://api.github.com/repos/${REGISTRY_REPOSITORY}/commits/${ref}`;
+}
+
+async function resolveCommit(ref, fetchImpl) {
+  if (COMMIT.test(ref)) return ref;
+  const response = await fetchImpl(commitUrl(ref), {
+    headers: { "user-agent": "hara-packages" },
+  });
+  if (!response.ok) return null;
+  let document;
   try {
-    upstream = upstreamUrl(ref);
+    document = await response.json();
+  } catch {
+    return null;
+  }
+  return COMMIT.test(document?.sha ?? "") ? document.sha : null;
+}
+
+async function registryDocument(url, fetchImpl = fetch) {
+  const ref = url.searchParams.get("ref") ?? "main";
+  let revision;
+  try {
+    revision = await resolveCommit(ref, fetchImpl);
   } catch (error) {
     return problem(400, "invalid-request", error.message);
   }
-  const response = await fetch(upstream, { headers: { "user-agent": "hara-packages" } });
+  if (revision == null) {
+    console.error(JSON.stringify({ event: "git-resolve-failed", kind: "registry", ref }));
+    return problem(502, "upstream-unavailable", "authoritative Git revision unavailable");
+  }
+  const response = await fetchImpl(upstreamUrl(revision), { headers: { "user-agent": "hara-packages" } });
   if (!response.ok) {
-    console.error(JSON.stringify({ event: "git-read-failed", kind: "registry", ref, status: response.status }));
+    console.error(JSON.stringify({ event: "git-read-failed", kind: "registry", ref: revision, status: response.status }));
     return problem(502, "upstream-unavailable", "authoritative Git document unavailable");
   }
   return edn(response.body, {
     headers: {
-      "cache-control": ref === "main"
-        ? "public, max-age=60"
-        : "public, max-age=31536000, immutable",
+      "cache-control": "public, max-age=31536000, immutable",
       "x-hara-authority": "git",
+      "x-hara-registry-commit": revision,
     },
   });
 }

@@ -42,15 +42,26 @@ test("tap discovery document is served from the well-known path", async () => {
   assert.match(body, /:tap\/registry "https:\/\/packages\.hara-lang\.org"/);
 });
 
-test("registry document streams the Git source with authority headers", async () => {
-  await withFetch(async (url) => ednBody(`;; fetched ${url}`), async () => {
+test("main resolves to an exact commit before serving an immutable registry document", async () => {
+  const commit = "c".repeat(40);
+  const seen = [];
+  await withFetch(async (url) => {
+    seen.push(url);
+    if (url.endsWith("/commits/main")) return new Response(JSON.stringify({ sha: commit }));
+    return ednBody(`;; fetched ${url}`);
+  }, async () => {
     const response = await handler(request("/v1/registry"));
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("content-type"), "application/edn; charset=utf-8");
     assert.equal(response.headers.get("x-hara-authority"), "git");
-    assert.equal(response.headers.get("cache-control"), "public, max-age=60");
+    assert.equal(response.headers.get("x-hara-registry-commit"), commit);
+    assert.equal(response.headers.get("cache-control"), "public, max-age=31536000, immutable");
+    assert.deepEqual(seen, [
+      "https://api.github.com/repos/hara-lang/hara-packages/commits/main",
+      `https://raw.githubusercontent.com/hara-lang/hara-packages/${commit}/registry.edn`,
+    ]);
     const body = await response.text();
-    assert.match(body, /raw\.githubusercontent\.com\/hara-lang\/hara-packages\/main\/registry\.edn/);
+    assert.match(body, new RegExp(`/hara-lang/hara-packages/${commit}/registry\\.edn`));
   });
 });
 
@@ -62,10 +73,12 @@ test("the authoritative registry document exposes package and namespace projecti
 });
 
 test("commit-pinned registry reads are immutable and long-cached", async () => {
+  const commit = "b".repeat(40);
   await withFetch(async () => ednBody(), async () => {
-    const response = await handler(request(`/v1/registry?ref=${"b".repeat(40)}`));
+    const response = await handler(request(`/v1/registry?ref=${commit}`));
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("cache-control"), "public, max-age=31536000, immutable");
+    assert.equal(response.headers.get("x-hara-registry-commit"), commit);
   });
 });
 
@@ -86,7 +99,11 @@ test("invalid refs are a 400 EDN problem and never reach the network", async () 
 });
 
 test("upstream failure is a 502 EDN problem", async () => {
-  await withFetch(async () => new Response("nope", { status: 404 }), async () => {
+  const commit = "e".repeat(40);
+  await withFetch(async (url) => {
+    if (url.endsWith("/commits/main")) return new Response(JSON.stringify({ sha: commit }));
+    return new Response("nope", { status: 404 });
+  }, async () => {
     const response = await handler(request("/v1/registry"));
     assert.equal(response.status, 502);
     assert.equal(response.headers.get("cache-control"), "no-store");
