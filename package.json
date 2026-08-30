@@ -2,6 +2,9 @@
   "name": "hara-packages",
   "private": true,
   "type": "module",
+  "dependencies": {
+    "@netlify/blobs": "10.7.10"
+  },
   "scripts": {
     "test": "node --test \"test/**/*.test.mjs\"",
     "publishing:authority": "node scripts/check-publishing-authority.mjs",
