@@ -16,7 +16,7 @@ import {
 
 const COMMIT = "a".repeat(40);
 const index = {
-  format: 1,
+  format: "0.0.0-alpha",
   registry: "hara",
   packages: [{
     id: "hara/example",

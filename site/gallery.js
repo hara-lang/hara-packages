@@ -1,4 +1,4 @@
-const GALLERY_FORMAT = 1;
+const GALLERY_FORMAT = "0.0.0-alpha";
 const ASSET_VERSION = "20260809-1";
 const SHOWCASE_PROTOCOL_VERSION = 1;
 const SELECT_SURFACE = "hara.showcase/select-surface";
@@ -172,7 +172,7 @@ export function displayStateValue(value) {
 
 function validIndex(value) {
   if (!plainRecord(value) || value.format !== GALLERY_FORMAT || value.registry !== "hara" || !Array.isArray(value.packages)) {
-    throw new Error("Gallery index does not match Hara Gallery format 1");
+    throw new Error("Gallery index does not match Hara Gallery format 0.0.0-alpha");
   }
   return value;
 }

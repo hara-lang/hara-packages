@@ -162,7 +162,7 @@ try {
   browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
   let identityClientRequests = 0;
-  await context.route("https://id.hara-lang.org/0-alpha/identity-client.js", async (route) => {
+  await context.route("https://id.hara-lang.org/v1/identity-client.js", async (route) => {
     identityClientRequests += 1;
     await route.fulfill({
       status: 200,
