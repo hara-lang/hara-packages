@@ -53,8 +53,10 @@ jobs:
             --annotation "org.opencontainers.image.description=Hara registry EDN" \
             registry.edn:application/vnd.hara.registry.v1+edn
           oras tag "$registry:sha-${GITHUB_SHA}" "${GITHUB_REF_NAME}"
-      - name: Verify public GitHub Packages registry artifact
+      - name: Verify published GitHub Packages registry artifact
         if: github.ref_name == 'main'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           registry="ghcr.io/${GITHUB_REPOSITORY}"
@@ -63,12 +65,12 @@ jobs:
           headers_path="$(mktemp)"
           layer_path="$(mktemp)"
           trap 'rm -f "$manifest_path" "$headers_path" "$layer_path"' EXIT
-          token="$(curl --fail-with-body --silent --show-error --location "$token_url" | jq -er '.token')"
-          curl --retry 36 --retry-delay 5 --retry-all-errors --fail-with-body --silent --show-error --location \
+          token="$(curl --user "$GITHUB_ACTOR:$GITHUB_TOKEN" --fail-with-body --silent --show-error --location "$token_url" | jq -er '.token')"
+          curl --fail-with-body --silent --show-error --location \
             --header "Authorization: Bearer $token" \
             --header 'Accept: application/vnd.oci.image.manifest.v1+json' \
             --dump-header "$headers_path" \
-            "https://$registry/manifests/main" \
+            "https://$registry/manifests/sha-${GITHUB_SHA}" \
             --output "$manifest_path"
           test "$(jq -r '.annotations["org.opencontainers.image.source"]' "$manifest_path")" = "https://github.com/${GITHUB_REPOSITORY}"
           test "$(jq -r '.annotations["org.opencontainers.image.revision"]' "$manifest_path")" = "$GITHUB_SHA"

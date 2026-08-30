@@ -21,9 +21,10 @@ test("publishes the checked-in registry as a provenance-labelled GHCR artifact b
   assert.match(workflow, /org\.opencontainers\.image\.source=https:\/\/github\.com\/\$\{GITHUB_REPOSITORY\}/);
   assert.match(workflow, /org\.opencontainers\.image\.revision=\$\{GITHUB_SHA\}/);
   assert.match(workflow, /Publish registry artifact to GitHub Packages\n\s+if: github\.ref_name == 'main'/);
-  assert.match(workflow, /Verify public GitHub Packages registry artifact/);
+  assert.match(workflow, /Verify published GitHub Packages registry artifact/);
   assert.match(workflow, /https:\/\/ghcr\.io\/token\?service=ghcr\.io/);
-  assert.match(workflow, /curl --retry 36 --retry-delay 5 --retry-all-errors --fail-with-body/);
+  assert.match(workflow, /--user "\$GITHUB_ACTOR:\$GITHUB_TOKEN"/);
+  assert.match(workflow, /manifests\/sha-\$\{GITHUB_SHA\}/);
   assert.match(workflow, /Authorization: Bearer \$token/);
   assert.match(workflow, /org\.opencontainers\.image\.source/);
   assert.match(workflow, /org\.opencontainers\.image\.revision/);
@@ -34,7 +35,7 @@ test("publishes the checked-in registry as a provenance-labelled GHCR artifact b
     "the endpoint must never deploy before its GHCR artifact exists",
   );
   assert.ok(
-    workflow.indexOf("Verify public GitHub Packages registry artifact") < workflow.indexOf("Deploy main to packages.hara-lang.org"),
-    "the endpoint must never deploy before anonymous GHCR reads are proven",
+    workflow.indexOf("Verify published GitHub Packages registry artifact") < workflow.indexOf("Deploy main to packages.hara-lang.org"),
+    "the endpoint must never deploy before the immutable GHCR artifact is proven",
   );
 });
