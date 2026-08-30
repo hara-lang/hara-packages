@@ -1,11 +1,17 @@
 # Hara package registry
 
-This is the reviewed Git registry for Hara packages. It records immutable,
-signed package releases; HARP archives themselves are GitHub Release assets on
-their source repositories.
+This is the reviewed registry for Hara packages. It records immutable, signed
+package releases; HARP archives themselves are GitHub Release assets on their
+source repositories.
 
-`packages.hara-lang.org` is generated from this repository. Clients resolve
-against a pinned Git commit and do not treat the website as authoritative.
+`packages.hara-lang.org` reads its registry EDN from the public OCI artifact at
+`ghcr.io/hara-lang/hara-packages`. The production CI workflow tags the artifact
+with `main` and the source `sha-<commit>`, then anonymously verifies its public
+manifest, provenance annotations and registry-layer digest before deploying
+Netlify. The endpoint verifies the same provenance and layer digest before
+serving EDN. A commit-pinned request is immutable; the `main` request is
+revalidated so it can advance with the GitHub Package. The website remains a
+convenience UI, not the registry authority.
 
 ## Shared GitHub identity
 
@@ -27,6 +33,11 @@ namespace-grant evidence in publication requests. These are implementation
 controls and transitional evidence, not additional public requirements of the
 draft Publishing specification. See [`docs/publishing-conformance.md`](docs/publishing-conformance.md).
 
+Native clients submit through [`docs/publication-intake.md`](docs/publication-intake.md).
+Intake verifies a root-signed publisher grant and a one-time Identity device
+authorization before creating a reviewable request receipt; it never accepts a
+publisher-uploaded archive.
+
 ## Layout
 
 - `registry.edn` — registry metadata and schema version.
@@ -40,7 +51,7 @@ draft Publishing specification. See [`docs/publishing-conformance.md`](docs/publ
   validation.
 - `site/` — generated/static package browser deployed through Netlify.
 
-The commit-pinned `registry.edn` also carries deterministic
+The GitHub-Package-pinned `registry.edn` also carries deterministic
 `:registry/packages` and `:registry/namespaces` projections. Runtime clients use
 those projections to discover locked namespaces without loading them, then
 download the selected immutable archive through
@@ -102,7 +113,8 @@ The normative draft flow is:
 4. A protected finalizer revalidates source and output bytes, writes immutable
    objects, creates the attestation and proposes the accepted release record.
 5. The release becomes authoritative and visible only after the protected
-   registry Git change is merged.
+   registry Git change is merged and CI has projected that exact revision to
+   the public GitHub Packages artifact.
 
 The exact implementation-to-spec mapping and known gaps are maintained in
 [`docs/publishing-conformance.md`](docs/publishing-conformance.md). Changes to

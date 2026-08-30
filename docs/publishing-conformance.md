@@ -11,6 +11,13 @@ The specification is normative. This repository is an implementation and may
 contain transitional evidence or additional internal controls that are not part
 of the public publishing protocol.
 
+The publisher-key, device-authorization, and exact-`project.edn` controls in
+this working tree follow a local amendment to that draft. They are intentionally
+not enabled as a production protocol yet: the amendment must first be committed
+and merged in `hara-specs-registry`, then this repository must advance
+`publishing-authority.json` to the resulting immutable commit and blob. Until
+then, the pinned revision above remains the public authority.
+
 ## Authority model
 
 The public authorization story is:
@@ -26,22 +33,22 @@ The public authorization story is:
 6. the release becomes authoritative and visible only after the protected
    registry Git change is merged.
 
-Publisher keys, detached signatures and namespace-grant evidence currently
-present in request fixtures are implementation evidence. They are not presented
-here as additional public requirements. Any decision to make them normative must
-first amend the Publishing specification.
+The staged implementation verifies a proven publisher key, a root-signed exact
+scope/grant, the stable GitHub subject, and one-time Identity authorization
+before creating an intake receipt. These controls become normative only when the
+linked specification amendment and authority pin are published together.
 
 ## Mapping
 
 | Contract | Current implementation evidence | Status | Required follow-up |
 | --- | --- | --- | --- |
-| `:hara.publishing.operation/sign-in` | Shared GitHub identity is described in `README.md`; Packages does not own the OAuth secret or provider token. | partial | Prove the portal session/repository authorization path against the GitHub App boundary. |
-| `:hara.publishing.operation/submit` | `requests/**` identify package coordinates and immutable source commits; candidate generation is review-only. | partial | Intake must derive package/release/build/extension/remote-artifact intent from exact-commit `project.edn`, not duplicate request fields. |
+| `:hara.publishing.operation/sign-in` | Identity owns GitHub OAuth; device confirmation records the stable GitHub subject and Packages owns no OAuth secret. | partial | Deploy the reviewed Identity App configuration and prove the live portal session/repository authorization path. |
+| `:hara.publishing.operation/submit` | `POST /v1/publications` verifies the root-signed key grant, exact canonical intent, publisher signature, and one-time Identity authorization before creating an immutable intake receipt PR. | partial | Publish the accompanying specification authority update and deploy the GitHub App configuration. |
 | `:hara.publishing.operation/build` | Candidate/reproducibility data and archive digests exist. | partial | Demonstrate isolated deterministic `.harp` production and lock verification with no protected credentials. |
-| `:hara.publishing.operation/finalize` | Registry attestation and finalized immutable records exist as protected-stage concepts. | partial | Prove revalidation, object conflict handling and protected registry proposal as one finalizer boundary. |
-| `:hara.publishing/github-identity` | Shared GitHub identity is implemented for the UI. | partial | Record narrowly scoped GitHub App repository authorization in implementation evidence. |
-| `:hara.publishing/project-authority` | Exact source commit/root are already recorded. | gap | Move duplicated package/build/extension/remote-artifact intent to `project.edn` authority; requests become evidence/selection only. |
-| `:hara.publishing/exact-source` | `:source/commit` is authoritative; tag/branch/workflow are supporting evidence. | partial | Record repository numeric id and exact `project.edn` digest in accepted intent/attestation evidence. |
+| `:hara.publishing.operation/finalize` | The protected finalizer verifies two byte-identical builds, the signed `project.edn` digest, immutable-object conflicts, and attestation output. | partial | Connect credential-free builder artifacts and the protected registry proposal in a deployed workflow. |
+| `:hara.publishing/github-identity` | Identity device authorization binds the numeric GitHub subject; the Packages and Identity GitHub Apps use only their scoped installation tokens. | partial | Configure the production Apps and record their reviewed repository permissions. |
+| `:hara.publishing/project-authority` | The canonical publisher intent binds `project.edn` and recipe digests at the tagged commit. | partial | Derive the remaining build/extension/remote-artifact selections in the credential-free builder. |
+| `:hara.publishing/exact-source` | The signed intent names source remote, bare-version tag (or declared override), commit, `project.edn` digest, and recipe digest. | partial | Have the protected builder re-read those exact bytes from the remote commit before finalization. |
 | `:hara.publishing/credential-separation` | Public docs describe protected jobs but do not yet prove credential absence in untrusted intake/build. | gap | Add a fixture/test asserting object-store write, registry mutation and finalizer signing credentials are unavailable to untrusted jobs. |
 | `:hara.publishing/reproducible` | Reproducibility metadata and archive digest checks exist. | partial | Resolve exact `project.edn`, verify `project.lock.edn`, mirror digest-pinned remote inputs and prove byte-identical `.harp` output. |
 | `:hara.publishing/accepted-git-only` | Candidates are explicitly unverified and not installable or shown in the Gallery. | aligned | Keep candidate and preview data outside authoritative package projections. |

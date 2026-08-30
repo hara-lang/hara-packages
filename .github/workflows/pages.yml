@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 concurrency:
   group: netlify-packages-${{ github.ref_name }}
@@ -35,6 +36,51 @@ jobs:
         run: npm run validate
         env:
           GITHUB_TOKEN: ${{ github.token }}
+      - name: Install ORAS
+        if: github.ref_name == 'main'
+        uses: oras-project/setup-oras@v1
+      - name: Publish registry artifact to GitHub Packages
+        if: github.ref_name == 'main'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          registry="ghcr.io/${GITHUB_REPOSITORY}"
+          echo "$GITHUB_TOKEN" | oras login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+          oras push "$registry:sha-${GITHUB_SHA}" \
+            --artifact-type application/vnd.hara.registry.v1 \
+            --annotation "org.opencontainers.image.source=https://github.com/${GITHUB_REPOSITORY}" \
+            --annotation "org.opencontainers.image.revision=${GITHUB_SHA}" \
+            --annotation "org.opencontainers.image.description=Hara registry EDN" \
+            registry.edn:application/vnd.hara.registry.v1+edn
+          oras tag "$registry:sha-${GITHUB_SHA}" "${GITHUB_REF_NAME}"
+      - name: Verify public GitHub Packages registry artifact
+        if: github.ref_name == 'main'
+        run: |
+          set -euo pipefail
+          registry="ghcr.io/${GITHUB_REPOSITORY}"
+          token_url="https://ghcr.io/token?service=ghcr.io&scope=repository%3A${GITHUB_REPOSITORY//\//%2F}%3Apull"
+          manifest_path="$(mktemp)"
+          headers_path="$(mktemp)"
+          layer_path="$(mktemp)"
+          trap 'rm -f "$manifest_path" "$headers_path" "$layer_path"' EXIT
+          token="$(curl --fail-with-body --silent --show-error --location "$token_url" | jq -er '.token')"
+          curl --fail-with-body --silent --show-error --location \
+            --header "Authorization: Bearer $token" \
+            --header 'Accept: application/vnd.oci.image.manifest.v1+json' \
+            --dump-header "$headers_path" \
+            "https://$registry/manifests/main" \
+            --output "$manifest_path"
+          test "$(jq -r '.annotations["org.opencontainers.image.source"]' "$manifest_path")" = "https://github.com/${GITHUB_REPOSITORY}"
+          test "$(jq -r '.annotations["org.opencontainers.image.revision"]' "$manifest_path")" = "$GITHUB_SHA"
+          layer_digest="$(jq -er '.layers[] | select(.mediaType == "application/vnd.hara.registry.v1+edn") | .digest' "$manifest_path")"
+          layer_count="$(jq '[.layers[] | select(.mediaType == "application/vnd.hara.registry.v1+edn")] | length' "$manifest_path")"
+          test "$layer_count" = 1
+          curl --fail-with-body --silent --show-error --location \
+            --header "Authorization: Bearer $token" \
+            "https://$registry/blobs/$layer_digest" \
+            --output "$layer_path"
+          test "sha256:$(shasum -a 256 "$layer_path" | cut -d ' ' -f 1)" = "$layer_digest"
+          grep -Eiq '^docker-content-digest: sha256:[0-9a-f]{64}' "$headers_path"
       - name: Verify built shared identity shell
         run: |
           grep -Fq 'data-hara-identity' site/index.html
