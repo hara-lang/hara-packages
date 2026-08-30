@@ -22,10 +22,8 @@ test("publishes the checked-in registry as a provenance-labelled GHCR artifact b
   assert.match(workflow, /org\.opencontainers\.image\.revision=\$\{GITHUB_SHA\}/);
   assert.match(workflow, /Publish registry artifact to GitHub Packages\n\s+if: github\.ref_name == 'main'/);
   assert.match(workflow, /Verify published GitHub Packages registry artifact/);
-  assert.match(workflow, /https:\/\/ghcr\.io\/token\?service=ghcr\.io/);
-  assert.match(workflow, /--user "\$GITHUB_ACTOR:\$GITHUB_TOKEN"/);
-  assert.match(workflow, /manifests\/sha-\$\{GITHUB_SHA\}/);
-  assert.match(workflow, /Authorization: Bearer \$token/);
+  assert.match(workflow, /oras manifest fetch --output "\$manifest_path" "\$registry:sha-\$\{GITHUB_SHA\}"/);
+  assert.match(workflow, /oras blob fetch --output "\$layer_path" "\$registry@\$layer_digest"/);
   assert.match(workflow, /org\.opencontainers\.image\.source/);
   assert.match(workflow, /org\.opencontainers\.image\.revision/);
   assert.match(workflow, /application\/vnd\.hara\.registry\.v1\+edn/);
