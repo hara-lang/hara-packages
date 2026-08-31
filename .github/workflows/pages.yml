@@ -22,6 +22,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Install publication function dependencies
+        run: npm install --ignore-scripts --package-lock=false
       - name: Build publication candidate projection
         run: npm run requests:build
         env:
@@ -82,7 +84,10 @@ jobs:
         run: npm run assets:version -- "$GITHUB_SHA"
       - name: Deploy testing to packages.testing.hara-lang.org
         if: github.ref_name == 'testing'
-        run: npx --yes netlify-cli deploy --prod --dir site --message "testing ${GITHUB_SHA}"
+        run: |
+          npx --yes netlify-cli build
+          unzip -l .netlify/functions/publication.zip | grep -F 'node_modules/@netlify/blobs/'
+          npx --yes netlify-cli deploy --prod --dir site --message "testing ${GITHUB_SHA}"
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_TESTING_SITE_ID }}
@@ -107,7 +112,10 @@ jobs:
           HARA_IDENTITY_ORIGIN: https://id.testing.hara-lang.org
       - name: Deploy main to packages.hara-lang.org
         if: github.ref_name == 'main'
-        run: npx --yes netlify-cli deploy --prod --dir site --message "main ${GITHUB_SHA}"
+        run: |
+          npx --yes netlify-cli build
+          unzip -l .netlify/functions/publication.zip | grep -F 'node_modules/@netlify/blobs/'
+          npx --yes netlify-cli deploy --prod --dir site --message "main ${GITHUB_SHA}"
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_PRODUCTION_SITE_ID }}
