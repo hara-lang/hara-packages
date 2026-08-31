@@ -100,7 +100,7 @@ showcase/
     src/main.hal
 ```
 
-See [`publication-requests.md`](publication-requests.md) for materialization and
+See [`../requests/README.md`](../requests/README.md) for receipt materialization and
 candidate review.
 
 ## Model

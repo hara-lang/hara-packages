@@ -1,0 +1,198 @@
+name: Publish Hara packages
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "requests/**"
+      - "publication-sources.json"
+      - "scripts/verify-publication-receipt.mjs"
+      - ".github/workflows/publish-packages.yml"
+  push:
+    branches: [main]
+    paths:
+      - "requests/**"
+      - "publication-sources.json"
+      - "scripts/prepare-specs-project.mjs"
+      - "scripts/verify-publication-receipt.mjs"
+      - ".github/workflows/publish-packages.yml"
+  workflow_dispatch:
+    inputs:
+      receipt:
+        description: "Receipt path to retry; leave empty only to verify every merged receipt"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+
+concurrency:
+  group: hara-packages-publish-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify-receipts:
+    runs-on: ubuntu-24.04
+    outputs:
+      receipts: ${{ steps.receipts.outputs.json }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: sigstore/cosign-installer@v3.9.0
+      - id: receipts
+        name: Validate GitHub-governed publication receipts
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -n "${{ inputs.receipt }}" ]; then
+            receipts=("${{ inputs.receipt }}")
+          else
+            mapfile -t receipts < <(find requests -type f -name '*.json' ! -name '*.sigstore.json' -print | sort)
+          fi
+          values=()
+          for receipt in "${receipts[@]}"; do
+            [ -f "$receipt" ] || { echo "receipt does not exist: $receipt" >&2; exit 1; }
+            summary="$(node scripts/verify-publication-receipt.mjs "$receipt")"
+            bundle="$(jq -r '.bundle' <<<"$summary")"
+            repository="$(jq -r '.repository' <<<"$summary")"
+            workflow="$(jq -r '.requestWorkflow' <<<"$summary")"
+            [ -f "$bundle" ] || { echo "receipt signature bundle does not exist: $bundle" >&2; exit 1; }
+            cosign verify-blob --bundle "$bundle" \
+              --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+              --certificate-identity "https://github.com/${repository}/${workflow}@refs/tags/$(jq -r '.tag' <<<"$summary")" \
+              "$receipt"
+            values+=("$summary")
+          done
+          printf 'json=%s\n' "$(printf '%s\n' "${values[@]}" | jq -cs '.')" >> "$GITHUB_OUTPUT"
+
+  publish:
+    if: github.event_name != 'pull_request' && needs.verify-receipts.outputs.receipts != '[]'
+    needs: verify-receipts
+    runs-on: ubuntu-24.04
+    environment: hara-packages-publish
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: oras-project/setup-oras@v1
+      - name: Authenticate the sole GHCR publishing boundary
+        env:
+          HARA_PACKAGES_GHCR_TOKEN: ${{ secrets.HARA_PACKAGES_GHCR_TOKEN }}
+          HARA_PACKAGES_GHCR_USERNAME: ${{ vars.HARA_PACKAGES_GHCR_USERNAME }}
+        run: |
+          set -euo pipefail
+          test -n "$HARA_PACKAGES_GHCR_TOKEN"
+          test -n "$HARA_PACKAGES_GHCR_USERNAME"
+          printf '%s' "$HARA_PACKAGES_GHCR_TOKEN" | oras login ghcr.io --username "$HARA_PACKAGES_GHCR_USERNAME" --password-stdin
+      - name: Rebuild, verify, publish, and read back each paired HARP release
+        env:
+          RECEIPTS: ${{ needs.verify-receipts.outputs.receipts }}
+          GH_TOKEN: ${{ github.token }}
+          HARA_PACKAGES_GHCR_TOKEN: ${{ secrets.HARA_PACKAGES_GHCR_TOKEN }}
+          HARA_PACKAGES_GHCR_USERNAME: ${{ vars.HARA_PACKAGES_GHCR_USERNAME }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r receipt; do
+            repository="$(jq -r '.repository' <<<"$receipt")"
+            image="$(jq -r '.image' <<<"$receipt")"
+            version="$(jq -r '.version' <<<"$receipt")"
+            coordinate="$(jq -r '.coordinate' <<<"$receipt")"
+            tag="$(jq -r '.tag' <<<"$receipt")"
+            commit="$(jq -r '.commit' <<<"$receipt")"
+            project_path="$(jq -r '.projectPath' <<<"$receipt")"
+            project_sha="$(jq -r '.projectSha256' <<<"$receipt")"
+            recipe_path="$(jq -r '.recipePath' <<<"$receipt")"
+            recipe_sha="$(jq -r '.recipeSha256' <<<"$receipt")"
+            native_repository="$(jq -r '.nativeRepository' <<<"$receipt")"
+            native_version="$(jq -r '.nativeVersion' <<<"$receipt")"
+            native_tag="$(jq -r '.nativeTag' <<<"$receipt")"
+            native_revision="$(jq -r '.nativeRevision' <<<"$receipt")"
+            specs_path="$(jq -r '.specsPath' <<<"$receipt")"
+            specs_tree="$(jq -r '.specsGitTree' <<<"$receipt")"
+            work="$(mktemp -d)"
+            trap 'rm -rf "$work"' EXIT
+            git clone --filter=blob:none --no-checkout "https://github.com/${repository}.git" "$work/source"
+            git -C "$work/source" fetch --depth=1 origin "refs/tags/${tag}:refs/tags/${tag}"
+            test "$(git -C "$work/source" rev-parse "${tag}^{commit}")" = "$commit"
+            test "$(git -C "$work/source" rev-parse "${commit}^{commit}")" = "$commit"
+            git -C "$work/source" verify-tag "$tag"
+            git -C "$work/source" checkout --detach "$commit"
+            test "sha256:$(shasum -a 256 "$work/source/$project_path/project.edn" | cut -d ' ' -f 1)" = "$project_sha"
+            test "sha256:$(shasum -a 256 "$work/source/$project_path/$recipe_path" | cut -d ' ' -f 1)" = "$recipe_sha"
+            if [ "$specs_tree" = absent ]; then
+              test ! -e "$work/source/$project_path/$specs_path"
+            else
+              test "$(git -C "$work/source" rev-parse "${commit}:$project_path/$specs_path")" = "$specs_tree"
+            fi
+            git clone --filter=blob:none --no-checkout "https://github.com/${native_repository}.git" "$work/native"
+            git -C "$work/native" fetch --depth=1 origin "refs/tags/${native_tag}:refs/tags/${native_tag}"
+            test "$(git -C "$work/native" rev-parse "${native_tag}^{commit}")" = "$native_revision"
+            git -C "$work/native" checkout --detach "$native_revision"
+            test "$(jq -er '.version' "$work/native/release/version.json")" = "$native_version"
+            native_release="$(gh api "repos/${native_repository}/releases/tags/${native_tag}")"
+            jq -e --arg tag "$native_tag" '.draft == false and .prerelease == false and .tag_name == $tag and any(.assets[]; .name == "release-manifest.json")' <<<"$native_release" >/dev/null
+            gh release download "$native_tag" --repo "$native_repository" --pattern release-manifest.json --dir "$work/native-release"
+            jq -e \
+              --arg tag "$native_tag" \
+              --arg version "$native_version" \
+              --arg revision "$native_revision" \
+              '.releaseTag == $tag and .version == $version and .commit == $revision' \
+              "$work/native-release/release-manifest.json" >/dev/null
+            cargo build --locked --release --manifest-path "$work/native/core/rust/Cargo.toml" --bin hara-native
+            native="$work/native/core/rust/target/release/hara-native"
+            "$native" test --project "$work/source/$project_path"
+            "$native" bundle build "$work/source/$project_path" --output "$work/source.harp"
+            "$native" bundle verify "$work/source.harp"
+            node scripts/prepare-specs-project.mjs "$work/source/$project_path" "$work/specs-project" "$specs_path" "$coordinate" "$version"
+            "$native" bundle build "$work/specs-project" --output "$work/specs.harp"
+            "$native" bundle verify "$work/specs.harp"
+            source_digest="sha256:$(shasum -a 256 "$work/source.harp" | cut -d ' ' -f 1)"
+            specs_digest="sha256:$(shasum -a 256 "$work/specs.harp" | cut -d ' ' -f 1)"
+            source_image="ghcr.io/hara-packages/${image}"
+            specs_image="ghcr.io/hara-packages/${image}.specs"
+            if oras manifest fetch --output "$work/source-existing.json" "$source_image:$version" 2>/dev/null; then
+              test "$(jq -r '.annotations["io.hara.package.coordinate"]' "$work/source-existing.json")" = "$coordinate"
+              test "$(jq -r '.annotations["org.opencontainers.image.revision"]' "$work/source-existing.json")" = "$commit"
+              test "$(jq -r '.layers[] | select(.mediaType == "application/vnd.hara.harp.v1+zip") | .digest' "$work/source-existing.json")" = "$source_digest"
+            else
+              oras push "$source_image:$version" --artifact-type application/vnd.hara.harp.v1 \
+                --annotation "org.opencontainers.image.source=https://github.com/${repository}" \
+                --annotation "org.opencontainers.image.revision=${commit}" \
+                --annotation "org.opencontainers.image.version=${version}" \
+                --annotation "io.hara.package.coordinate=${coordinate}" \
+                --annotation "io.hara.package.kind=source" \
+                "$work/source.harp:application/vnd.hara.harp.v1+zip"
+            fi
+            if oras manifest fetch --output "$work/specs-existing.json" "$specs_image:$version" 2>/dev/null; then
+              test "$(jq -r '.annotations["io.hara.package.source-coordinate"]' "$work/specs-existing.json")" = "$coordinate"
+              test "$(jq -r '.annotations["org.opencontainers.image.revision"]' "$work/specs-existing.json")" = "$commit"
+              test "$(jq -r '.layers[] | select(.mediaType == "application/vnd.hara.harp.v1+zip") | .digest' "$work/specs-existing.json")" = "$specs_digest"
+            else
+              oras push "$specs_image:$version" --artifact-type application/vnd.hara.harp.v1 \
+                --annotation "org.opencontainers.image.source=https://github.com/${repository}" \
+                --annotation "org.opencontainers.image.revision=${commit}" \
+                --annotation "org.opencontainers.image.version=${version}" \
+                --annotation "io.hara.package.coordinate=${coordinate}.specs" \
+                --annotation "io.hara.package.source-coordinate=${coordinate}" \
+                --annotation "io.hara.package.kind=specs" \
+                "$work/specs.harp:application/vnd.hara.harp.v1+zip"
+            fi
+            oras tag "$source_image:$version" "sha-${commit}"
+            oras tag "$specs_image:$version" "sha-${commit}"
+            GH_TOKEN="$HARA_PACKAGES_GHCR_TOKEN" gh api --method PATCH \
+              "/orgs/hara-packages/packages/container/${image}" --raw-field visibility=public
+            GH_TOKEN="$HARA_PACKAGES_GHCR_TOKEN" gh api --method PATCH \
+              "/orgs/hara-packages/packages/container/${image}.specs" --raw-field visibility=public
+            oras manifest fetch --output "$work/source-final.json" "$source_image:$version"
+            oras manifest fetch --output "$work/specs-final.json" "$specs_image:$version"
+            test "$(jq -r '.layers[] | select(.mediaType == "application/vnd.hara.harp.v1+zip") | .digest' "$work/source-final.json")" = "$source_digest"
+            test "$(jq -r '.layers[] | select(.mediaType == "application/vnd.hara.harp.v1+zip") | .digest' "$work/specs-final.json")" = "$specs_digest"
+            rm -rf "$work"
+            trap - EXIT
+          done < <(jq -c '.[]' <<<"$RECEIPTS")

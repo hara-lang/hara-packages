@@ -1,0 +1,13 @@
+{
+  "format": "hara-package-sources/1",
+  "sources": {
+    "hara-lang/hara": {
+      "coordinate": "hara:hara/foundation",
+      "projectPath": ".",
+      "requestWorkflow": ".github/workflows/package-publication-request.yml",
+      "nativeRepository": "hara-lang/hara-native",
+      "nativeTagPrefix": "v",
+      "specPath": "spec"
+    }
+  }
+}
