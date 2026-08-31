@@ -5,8 +5,6 @@ on:
     paths:
       - "site/**"
       - "packages/**"
-      - "requests/**"
-      - "registry.edn"
       - "src/**"
       - "scripts/**"
       - "docs/**"
@@ -21,8 +19,6 @@ on:
     paths:
       - "site/**"
       - "packages/**"
-      - "requests/**"
-      - "registry.edn"
       - "src/**"
       - "scripts/**"
       - "docs/**"
@@ -48,7 +44,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install publication function dependencies
+      - name: Install service dependencies
         run: npm install --ignore-scripts --package-lock=false
       - run: npm run validate
         env:
