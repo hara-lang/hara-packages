@@ -92,6 +92,18 @@ export function parsePublicationSubmission(value) {
   return { intent, keyId, signature, authorization: { payload, signature: authorizationSignature } };
 }
 
+function verifyAuthorizationBinding(payload, { keyId, intent, source, publisher, policy, now }) {
+  if (payload.authorization !== "hara-publisher/1") throw new Error("Publication authorization protocol is unsupported");
+  if (payload.keyId !== keyId) throw new Error("Publication authorization key does not match the publisher signature");
+  if (payload.coordinate !== intent.coordinate) throw new Error("Publication authorization coordinate does not match the package");
+  if (payload.intentSha256 !== sha256(source)) throw new Error("Publication authorization does not bind the submitted intent");
+  if (payload.identityRevision !== policy.revision) throw new Error("Publication authorization policy revision does not match the canonical intent");
+  if (typeof payload.githubSubject !== "string" || !/^\d+$/.test(payload.githubSubject)) throw new Error("Publication authorization GitHub subject is invalid");
+  if (publisher.githubSubject !== payload.githubSubject) throw new Error("Publication authorization GitHub subject is not authorized for this publisher key");
+  if (typeof payload.nonce !== "string" || payload.nonce.length < 24) throw new Error("Publication authorization nonce is invalid");
+  if (Date.parse(payload.expiresAt) <= now) throw new Error("Publication authorization has expired");
+}
+
 export function verifyPublicationSubmission(submission, policy, { now = Date.now() } = {}) {
   const parsed = parsePublicationSubmission(submission);
   const intent = parsePublicationIntent(parsed.intent);
@@ -103,17 +115,7 @@ export function verifyPublicationSubmission(submission, policy, { now = Date.now
     throw new Error("Publisher intent signature is invalid");
   }
   const payload = parsed.authorization.payload;
-  if (payload.authorization !== "hara-publisher/1"
-    || payload.keyId !== parsed.keyId
-    || payload.coordinate !== intent.coordinate
-    || payload.intentSha256 !== sha256(parsed.intent)
-    || payload.identityRevision !== policy.revision
-    || typeof payload.githubSubject !== "string" || !/^\d+$/.test(payload.githubSubject)
-    || publisher.githubSubject !== payload.githubSubject
-    || typeof payload.nonce !== "string" || payload.nonce.length < 24
-    || Date.parse(payload.expiresAt) <= now) {
-    throw new Error("Publication authorization does not bind this current submission");
-  }
+  verifyAuthorizationBinding(payload, { keyId: parsed.keyId, intent, source: parsed.intent, publisher, policy, now });
   if (!HEX_32.test(policy.authorizationPublicKey ?? "")) throw new Error("Signed identity policy has no publication authorization key");
   if (!verifyDetached(null, Buffer.from(canonicalAuthorization(payload)), rawEd25519PublicKey(policy.authorizationPublicKey), Buffer.from(parsed.authorization.signature, "hex"))) {
     throw new Error("Publication authorization signature is invalid");

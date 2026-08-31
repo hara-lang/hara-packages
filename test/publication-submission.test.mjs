@@ -76,11 +76,29 @@ test("rejects a valid authorization replayed for a changed intent", () => {
 test("rejects expired authorization even when the publisher signature is valid", () => {
   const { submission: value, policy } = submission();
   value.authorization.payload.expiresAt = new Date(NOW - 1).toISOString();
-  assert.throws(() => verifyPublicationSubmission(value, policy, { now: NOW }), /does not bind/);
+  assert.throws(() => verifyPublicationSubmission(value, policy, { now: NOW }), /authorization has expired/);
 });
 
 test("rejects a valid service authorization from a GitHub subject other than the granted publisher", () => {
   const { submission: value, policy } = submission();
   policy.publisherKeys["hoebat-2026-01"].githubSubject = "999999";
-  assert.throws(() => verifyPublicationSubmission(value, policy, { now: NOW }), /does not bind/);
+  assert.throws(() => verifyPublicationSubmission(value, policy, { now: NOW }), /GitHub subject is not authorized/);
+});
+
+test("identifies an authorization payload with the wrong protocol discriminator", () => {
+  const { submission: value, policy } = submission();
+  value.authorization.payload.authorization = "hara-publisher/0";
+  assert.throws(
+    () => verifyPublicationSubmission(value, policy, { now: NOW }),
+    /authorization protocol is unsupported/,
+  );
+});
+
+test("identifies an authorization replayed for a different intent", () => {
+  const { submission: value, policy } = submission();
+  value.authorization.payload.intentSha256 = `sha256:${"0".repeat(64)}`;
+  assert.throws(
+    () => verifyPublicationSubmission(value, policy, { now: NOW }),
+    /authorization does not bind the submitted intent/,
+  );
 });
