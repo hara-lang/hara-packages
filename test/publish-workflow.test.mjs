@@ -9,6 +9,8 @@ test("the dedicated workflow validates untrusted receipt PRs without a GHCR cred
   assert.match(workflow, /pull_request:/);
   assert.match(workflow, /Validate GitHub-governed publication receipts/);
   assert.match(workflow, /cosign verify-blob/);
+  assert.match(workflow, /--certificate-identity-regexp/);
+  assert.match(workflow, /refs\/\(tags\/\$\{tag_re\}\|heads\/main\)/);
   assert.doesNotMatch(workflow.slice(0, workflow.indexOf("  publish:")), /HARA_PACKAGES_GHCR_TOKEN/);
 });
 
