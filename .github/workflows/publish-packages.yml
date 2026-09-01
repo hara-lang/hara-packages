@@ -89,7 +89,7 @@ jobs:
           test -n "$HARA_PACKAGES_GHCR_TOKEN"
           test -n "$HARA_PACKAGES_GHCR_USERNAME"
           printf '%s' "$HARA_PACKAGES_GHCR_TOKEN" | oras login ghcr.io --username "$HARA_PACKAGES_GHCR_USERNAME" --password-stdin
-      - name: Rebuild, verify, publish, and read back each paired HARP release
+      - name: Rebuild, verify, publish, and read back each HARP release graph
         env:
           RECEIPTS: ${{ needs.verify-receipts.outputs.receipts }}
           GH_TOKEN: ${{ github.token }}
@@ -193,6 +193,69 @@ jobs:
             oras manifest fetch --output "$work/specs-final.json" "$specs_image:$version"
             test "$(jq -r '.layers[] | select(.mediaType == "application/vnd.hara.harp.v1+zip") | .digest' "$work/source-final.json")" = "$source_digest"
             test "$(jq -r '.layers[] | select(.mediaType == "application/vnd.hara.harp.v1+zip") | .digest' "$work/specs-final.json")" = "$specs_digest"
+            "$native" distribution build "$work/source/$project_path" --output "$work/hara"
+            "$work/hara/bin/hara" deploy build --root "$work/source/$project_path"
+            deploy_root="$work/source/$project_path/target/deploy"
+            mapfile -t semantic_archives < <(find "$deploy_root" -type f -path '*/target/package.harp' -print | sort)
+            test "${#semantic_archives[@]}" -gt 0
+            semantic_index=0
+            for archive in "${semantic_archives[@]}"; do
+              metadata="$("$native" bundle inspect "$archive" --json)"
+              package_name="$(jq -er '.name | strings | select(length > 0)' <<<"$metadata")"
+              package_coordinate="$(jq -er '.coordinate | strings | select(length > 0)' <<<"$metadata")"
+              package_version="$(jq -er '.version | strings | select(length > 0)' <<<"$metadata")"
+              [[ "$package_name" =~ ^hara/[a-z0-9][a-z0-9._-]*$ ]]
+              test "$package_coordinate" = "hara:${package_name}"
+              test "$package_version" = "$version"
+              package_image="${image}.packages.${package_name//\//.}"
+              package_specs_image="${package_image}.specs"
+              package_source_image="ghcr.io/hara-packages/${package_image}"
+              package_specs_oci_image="ghcr.io/hara-packages/${package_specs_image}"
+              package_digest="sha256:$(shasum -a 256 "$archive" | cut -d ' ' -f 1)"
+              module_specs="$work/semantic-specs/${semantic_index}"
+              node scripts/prepare-specs-project.mjs "$work/source/$project_path" "$module_specs" "semantic-specs/${package_name}" "$package_coordinate" "$version"
+              "$native" bundle build "$module_specs" --output "$module_specs/specs.harp"
+              "$native" bundle verify "$module_specs/specs.harp"
+              package_specs_digest="sha256:$(shasum -a 256 "$module_specs/specs.harp" | cut -d ' ' -f 1)"
+              if oras manifest fetch --output "$work/package-existing-${semantic_index}.json" "$package_source_image:$version" 2>/dev/null; then
+                test "$(jq -r '.annotations["io.hara.package.coordinate"]' "$work/package-existing-${semantic_index}.json")" = "$package_coordinate"
+                test "$(jq -r '.annotations["org.opencontainers.image.revision"]' "$work/package-existing-${semantic_index}.json")" = "$commit"
+                test "$(jq -r '.layers[] | select(.mediaType == "application/vnd.hara.harp.v1+zip") | .digest' "$work/package-existing-${semantic_index}.json")" = "$package_digest"
+              else
+                oras push "$package_source_image:$version" --artifact-type application/vnd.hara.harp.v1 \
+                  --annotation "org.opencontainers.image.source=https://github.com/${repository}" \
+                  --annotation "org.opencontainers.image.revision=${commit}" \
+                  --annotation "org.opencontainers.image.version=${version}" \
+                  --annotation "io.hara.package.coordinate=${package_coordinate}" \
+                  --annotation "io.hara.package.kind=source" \
+                  "$archive:application/vnd.hara.harp.v1+zip"
+              fi
+              if oras manifest fetch --output "$work/package-specs-existing-${semantic_index}.json" "$package_specs_oci_image:$version" 2>/dev/null; then
+                test "$(jq -r '.annotations["io.hara.package.source-coordinate"]' "$work/package-specs-existing-${semantic_index}.json")" = "$package_coordinate"
+                test "$(jq -r '.annotations["org.opencontainers.image.revision"]' "$work/package-specs-existing-${semantic_index}.json")" = "$commit"
+                test "$(jq -r '.layers[] | select(.mediaType == "application/vnd.hara.harp.v1+zip") | .digest' "$work/package-specs-existing-${semantic_index}.json")" = "$package_specs_digest"
+              else
+                oras push "$package_specs_oci_image:$version" --artifact-type application/vnd.hara.harp.v1 \
+                  --annotation "org.opencontainers.image.source=https://github.com/${repository}" \
+                  --annotation "org.opencontainers.image.revision=${commit}" \
+                  --annotation "org.opencontainers.image.version=${version}" \
+                  --annotation "io.hara.package.coordinate=${package_coordinate}.specs" \
+                  --annotation "io.hara.package.source-coordinate=${package_coordinate}" \
+                  --annotation "io.hara.package.kind=specs" \
+                  "$module_specs/specs.harp:application/vnd.hara.harp.v1+zip"
+              fi
+              oras tag "$package_source_image:$version" "sha-${commit}"
+              oras tag "$package_specs_oci_image:$version" "sha-${commit}"
+              GH_TOKEN="$HARA_PACKAGES_GHCR_TOKEN" gh api --method PATCH \
+                "/orgs/hara-packages/packages/container/${package_image}" --raw-field visibility=public
+              GH_TOKEN="$HARA_PACKAGES_GHCR_TOKEN" gh api --method PATCH \
+                "/orgs/hara-packages/packages/container/${package_specs_image}" --raw-field visibility=public
+              oras manifest fetch --output "$work/package-final-${semantic_index}.json" "$package_source_image:$version"
+              oras manifest fetch --output "$work/package-specs-final-${semantic_index}.json" "$package_specs_oci_image:$version"
+              test "$(jq -r '.layers[] | select(.mediaType == "application/vnd.hara.harp.v1+zip") | .digest' "$work/package-final-${semantic_index}.json")" = "$package_digest"
+              test "$(jq -r '.layers[] | select(.mediaType == "application/vnd.hara.harp.v1+zip") | .digest' "$work/package-specs-final-${semantic_index}.json")" = "$package_specs_digest"
+              semantic_index=$((semantic_index + 1))
+            done
             rm -rf "$work"
             trap - EXIT
           done < <(jq -c '.[]' <<<"$RECEIPTS")

@@ -5,8 +5,8 @@ source packages. The authoritative bytes and metadata are public OCI artifacts
 under `ghcr.io/hara-packages`; this repository neither stores package archives
 nor accepts archive uploads.
 
-For source repository `owner/repo`, a release publishes the paired immutable
-artifacts:
+For source repository `owner/repo`, a release preserves the paired immutable
+root artifacts:
 
 ```text
 ghcr.io/hara-packages/owner.repo:<version>
@@ -18,16 +18,30 @@ verifiable HARP package containing the optional `spec/` tree and its generated
 manifest. A project with no `spec/` directory still publishes an empty specs
 companion.
 
+When a source project declares `config/packages.edn`, the protected workflow
+also builds its dependency-ordered semantic package graph through the released
+companion `hara` executable. Each semantic package is published with a stable
+derived image name and an empty-or-owned specs companion, for example:
+
+```text
+hara/std.config  -> ghcr.io/hara-packages/hara-lang.hara.packages.hara.std.config:<version>
+```
+
+The HARP manifest remains authoritative for the package coordinate, version,
+resources, and checksums; the image path is deterministic discovery metadata.
+The workflow rejects names outside the reviewed `hara/*` namespace, validates
+every HARP before publication, and reads every OCI manifest back afterward.
+
 ## Publication
 
 `publish-packages.yml` is the only workflow allowed to write to GHCR. A source
 tag workflow creates a canonical OIDC/Sigstore-signed receipt PR under
 `requests/<owner.repo>/<version>.json`. Pull requests validate the receipt,
 source policy, and workflow identity without package credentials. After a
-protected merge, the workflow verifies the signed tag, rebuilds both HARP
-archives with the pinned Hara Native revision, verifies them, publishes
-immutable version and source-commit tags, makes both packages public, and reads
-their manifests back.
+protected merge, the workflow verifies the signed tag, rebuilds the root,
+specs, and semantic HARP graph with the pinned Hara Native revision, verifies
+them, publishes immutable version and source-commit tags, makes every package
+public, and reads their manifests back.
 
 The protected `hara-packages-publish` environment must provide:
 
