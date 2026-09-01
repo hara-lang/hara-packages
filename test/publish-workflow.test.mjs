@@ -12,7 +12,7 @@ test("the dedicated workflow validates untrusted receipt PRs without a GHCR cred
   assert.doesNotMatch(workflow.slice(0, workflow.indexOf("  publish:")), /HARA_PACKAGES_GHCR_TOKEN/);
 });
 
-test("only the protected post-merge job rebuilds and publishes paired GHCR artifacts", () => {
+test("only the protected post-merge job rebuilds and publishes the root and semantic GHCR graph", () => {
   assert.match(workflow, /environment: hara-packages-publish/);
   assert.match(workflow, /HARA_PACKAGES_GHCR_TOKEN/);
   assert.match(workflow, /ghcr\.io\/hara-packages\/\$\{image\}/);
@@ -23,6 +23,11 @@ test("only the protected post-merge job rebuilds and publishes paired GHCR artif
   assert.match(workflow, /release-manifest\.json/);
   assert.match(workflow, /bundle build "\$work\/source/);
   assert.match(workflow, /prepare-specs-project\.mjs/);
+  assert.match(workflow, /distribution build "\$work\/source\/\$project_path" --output "\$work\/hara"/);
+  assert.match(workflow, /\$work\/hara\/bin\/hara" deploy build --root "\$work\/source\/\$project_path"/);
+  assert.match(workflow, /bundle inspect "\$archive" --json/);
+  assert.match(workflow, /semantic_archives/);
+  assert.match(workflow, /\.packages\.\$\{package_name\/\/\\\/\/\.\}/);
   assert.match(workflow, /application\/vnd\.hara\.harp\.v1\+zip/);
   assert.match(workflow, /oras manifest fetch --output "\$work\/source-final\.json"/);
   assert.match(workflow, /visibility=public/);
