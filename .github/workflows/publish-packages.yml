@@ -60,10 +60,17 @@ jobs:
             bundle="$(jq -r '.bundle' <<<"$summary")"
             repository="$(jq -r '.repository' <<<"$summary")"
             workflow="$(jq -r '.requestWorkflow' <<<"$summary")"
+            tag="$(jq -r '.tag' <<<"$summary")"
+            escape_ere() {
+              sed 's/[][\\.^$*+?{}|()]/\\&/g'
+            }
+            repository_re="$(printf '%s' "$repository" | escape_ere)"
+            workflow_re="$(printf '%s' "$workflow" | escape_ere)"
+            tag_re="$(printf '%s' "$tag" | escape_ere)"
             [ -f "$bundle" ] || { echo "receipt signature bundle does not exist: $bundle" >&2; exit 1; }
             cosign verify-blob --bundle "$bundle" \
               --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-              --certificate-identity "https://github.com/${repository}/${workflow}@refs/tags/$(jq -r '.tag' <<<"$summary")" \
+              --certificate-identity-regexp "^https://github\\.com/${repository_re}/${workflow_re}@refs/(tags/${tag_re}|heads/main)$" \
               "$receipt"
             values+=("$summary")
           done
