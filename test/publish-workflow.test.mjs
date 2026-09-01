@@ -16,7 +16,10 @@ test("the dedicated workflow validates untrusted receipt PRs without a GHCR cred
 
 test("only the protected post-merge job rebuilds and publishes the root and semantic GHCR graph", () => {
   assert.match(workflow, /environment: hara-packages-publish/);
-  assert.match(workflow, /HARA_PACKAGES_GHCR_TOKEN/);
+  assert.match(workflow, /packages: write/);
+  assert.match(workflow, /GHCR_USERNAME: \$\{\{ github\.actor \}\}/);
+  assert.match(workflow, /printf '%s' "\$GH_TOKEN" \| oras login ghcr\.io/);
+  assert.doesNotMatch(workflow, /HARA_PACKAGES_GHCR_TOKEN/);
   assert.match(workflow, /ghcr\.io\/hara-packages\/\$\{image\}/);
   assert.match(workflow, /\$\{image\}\.specs/);
   assert.match(workflow, /git -C "\$work\/source" verify-tag/);

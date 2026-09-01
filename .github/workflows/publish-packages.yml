@@ -25,6 +25,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
   id-token: write
   attestations: write
 
@@ -89,19 +90,17 @@ jobs:
       - uses: oras-project/setup-oras@v1
       - name: Authenticate the sole GHCR publishing boundary
         env:
-          HARA_PACKAGES_GHCR_TOKEN: ${{ secrets.HARA_PACKAGES_GHCR_TOKEN }}
-          HARA_PACKAGES_GHCR_USERNAME: ${{ vars.HARA_PACKAGES_GHCR_USERNAME }}
+          GHCR_USERNAME: ${{ github.actor }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          test -n "$HARA_PACKAGES_GHCR_TOKEN"
-          test -n "$HARA_PACKAGES_GHCR_USERNAME"
-          printf '%s' "$HARA_PACKAGES_GHCR_TOKEN" | oras login ghcr.io --username "$HARA_PACKAGES_GHCR_USERNAME" --password-stdin
+          test -n "$GH_TOKEN"
+          test -n "$GHCR_USERNAME"
+          printf '%s' "$GH_TOKEN" | oras login ghcr.io --username "$GHCR_USERNAME" --password-stdin
       - name: Rebuild, verify, publish, and read back each HARP release graph
         env:
           RECEIPTS: ${{ needs.verify-receipts.outputs.receipts }}
           GH_TOKEN: ${{ github.token }}
-          HARA_PACKAGES_GHCR_TOKEN: ${{ secrets.HARA_PACKAGES_GHCR_TOKEN }}
-          HARA_PACKAGES_GHCR_USERNAME: ${{ vars.HARA_PACKAGES_GHCR_USERNAME }}
         shell: bash
         run: |
           set -euo pipefail
@@ -192,9 +191,9 @@ jobs:
             fi
             oras tag "$source_image:$version" "sha-${commit}"
             oras tag "$specs_image:$version" "sha-${commit}"
-            GH_TOKEN="$HARA_PACKAGES_GHCR_TOKEN" gh api --method PATCH \
+            gh api --method PATCH \
               "/orgs/hara-packages/packages/container/${image}" --raw-field visibility=public
-            GH_TOKEN="$HARA_PACKAGES_GHCR_TOKEN" gh api --method PATCH \
+            gh api --method PATCH \
               "/orgs/hara-packages/packages/container/${image}.specs" --raw-field visibility=public
             oras manifest fetch --output "$work/source-final.json" "$source_image:$version"
             oras manifest fetch --output "$work/specs-final.json" "$specs_image:$version"
@@ -253,9 +252,9 @@ jobs:
               fi
               oras tag "$package_source_image:$version" "sha-${commit}"
               oras tag "$package_specs_oci_image:$version" "sha-${commit}"
-              GH_TOKEN="$HARA_PACKAGES_GHCR_TOKEN" gh api --method PATCH \
+              gh api --method PATCH \
                 "/orgs/hara-packages/packages/container/${package_image}" --raw-field visibility=public
-              GH_TOKEN="$HARA_PACKAGES_GHCR_TOKEN" gh api --method PATCH \
+              gh api --method PATCH \
                 "/orgs/hara-packages/packages/container/${package_specs_image}" --raw-field visibility=public
               oras manifest fetch --output "$work/package-final-${semantic_index}.json" "$package_source_image:$version"
               oras manifest fetch --output "$work/package-specs-final-${semantic_index}.json" "$package_specs_oci_image:$version"
