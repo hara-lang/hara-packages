@@ -104,6 +104,20 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          gpg --batch --import <<'HARA_RELEASES_KEY'
+          -----BEGIN PGP PUBLIC KEY BLOCK-----
+
+          mDMEapR6KBYJKwYBBAHaRw8BAQdA6L1yrauB0QtVanhWE8jFpAxQ1vn9L6R8w0ZF
+          OM2MapK0K0hhcmEgTGFuZyBSZWxlYXNlcyA8cmVsZWFzZXNAaGFyYS1sYW5nLm9y
+          Zz6ItQQTFgoAXRYhBGtvWiUO1y4EFO2zNYSlMqUXJttuBQJqlHooGxSAAAAAAAQA
+          Dm1hbnUyLDIuNSsxLjEyLDAsMwIbAwUJA8JnAAULCQgHAgIiAgYVCgkICwIEFgID
+          AQIeBwIXgAAKCRCEpTKlFybbbh4eAPwJW1BTsATFrKtLpvoS6g9A0HL1jK/UzbyT
+          pkLe2nRhHwD+Pjj3fq9QOWgP1ITuDJlwwLV6swdn9WFyjXNuW6Z5oA4=
+          =3SIH
+          -----END PGP PUBLIC KEY BLOCK-----
+          HARA_RELEASES_KEY
+          release_key_fingerprint="$(gpg --batch --with-colons --list-keys releases@hara-lang.org | awk -F: '$1 == "fpr" { print $10; exit }')"
+          test "$release_key_fingerprint" = "6B6F5A250ED72E0414EDB33584A532A51726DB6E"
           while IFS= read -r receipt; do
             repository="$(jq -r '.repository' <<<"$receipt")"
             image="$(jq -r '.image' <<<"$receipt")"
