@@ -1,0 +1,27 @@
+{
+  "format": "hara-package-receipt/1",
+  "source": {
+    "repository": "hara-lang/hara",
+    "coordinate": "hara:hara/foundation",
+    "projectPath": ".",
+    "tag": "0.1.16",
+    "version": "0.1.16",
+    "commit": "bea1eb827b8e761588f548df7217fa137090c976",
+    "projectSha256": "sha256:29253ce97d08530c0b1d9d397ca88078fa80498cf82eb790ecac3fdc2cf472c8",
+    "recipePath": "project.receipe.edn",
+    "recipeSha256": "sha256:a96cff1f5519479b6ab29c968ebf01c29d5223855361835cbe7cf567a590ab4a",
+    "native": {
+      "repository": "hara-lang/hara-native",
+      "version": "0.1.20",
+      "tag": "v0.1.20",
+      "revision": "fa44369558b8684843007da332511ff798164773"
+    }
+  },
+  "specs": {
+    "path": "spec",
+    "gitTree": "d58cf4551f9039610c9d5bb23fae7a226bff8864"
+  },
+  "signature": {
+    "bundle": "requests/hara-lang.hara/0.1.16.sigstore.json"
+  }
+}
