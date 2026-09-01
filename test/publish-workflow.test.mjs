@@ -20,6 +20,8 @@ test("only the protected post-merge job rebuilds and publishes the root and sema
   assert.match(workflow, /GHCR_USERNAME: \$\{\{ github\.actor \}\}/);
   assert.match(workflow, /printf '%s' "\$GH_TOKEN" \| oras login ghcr\.io/);
   assert.doesNotMatch(workflow, /HARA_PACKAGES_GHCR_TOKEN/);
+  assert.match(workflow, /gpg --batch --import/);
+  assert.match(workflow, /6B6F5A250ED72E0414EDB33584A532A51726DB6E/);
   assert.match(workflow, /ghcr\.io\/hara-packages\/\$\{image\}/);
   assert.match(workflow, /\$\{image\}\.specs/);
   assert.match(workflow, /git -C "\$work\/source" verify-tag/);
