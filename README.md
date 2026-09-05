@@ -43,17 +43,29 @@ specs, and semantic HARP graph with the pinned Hara Native revision, verifies
 them, publishes immutable version and source-commit tags, makes every package
 public, and reads their manifests back.
 
-The protected `hara-packages-publish` environment must provide:
-
-```text
-HARA_PACKAGES_GHCR_TOKEN       classic PAT authorized to write hara-packages GHCR packages
-HARA_PACKAGES_GHCR_USERNAME    owner of that token
-```
+The protected `hara-packages-publish` environment is the approval boundary.
+The workflow uses its ephemeral `GITHUB_TOKEN` with the workflow-level
+`packages: write` permission; no long-lived GHCR PAT or package username is
+required.
 
 Source repositories receive only the GitHub App credential needed to open a
 reviewable receipt PR. They never receive a GHCR credential. Add a source to
 [`publication-sources.json`](publication-sources.json) through normal review
 before it can publish.
+
+## Administrator setup
+
+- Protect `main` and require the receipt-validation checks before merge.
+- Require reviewers for the `hara-packages-publish` environment and permit its
+  `GITHUB_TOKEN` to write packages in the `hara-packages` organization.
+- Keep the source-receipt App limited to `hara-packages` contents writes; it
+  must not receive GHCR package credentials.
+- Keep the release-signing public key fingerprint in this workflow aligned
+  with the source request workflow. Private signing material stays outside
+  repository contents.
+- Configure the Netlify site with the optional read-only
+  `HARA_GITHUB_PACKAGES_READ_TOKEN` if GitHub Packages API rate limits require
+  authenticated catalog reads.
 
 ## Public API
 

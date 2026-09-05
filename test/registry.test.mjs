@@ -24,6 +24,25 @@ const entry = {
   },
 };
 
+const semanticEntry = {
+  source: {
+    coordinate: "hara:hara/lang.core",
+    tag: "0.1.0",
+    repository: "ghcr.io/hara-packages/hara-lang.hara.packages.hara.lang.core",
+    manifest: `sha256:${"f".repeat(64)}`,
+    archive: `sha256:${"1".repeat(64)}`,
+    size: 43,
+    source: "https://github.com/hara-lang/hara",
+    revision: "c".repeat(40),
+  },
+  specs: {
+    repository: "ghcr.io/hara-packages/hara-lang.hara.packages.hara.lang.core.specs",
+    manifest: `sha256:${"2".repeat(64)}`,
+    archive: `sha256:${"3".repeat(64)}`,
+    size: 25,
+  },
+};
+
 function catalog(entries = [entry]) {
   return { async read() { return entries; } };
 }
@@ -36,6 +55,13 @@ test("registry projects paired GHCR source and specs descriptors into one determ
   assert.match(body, /:oci\/repository "ghcr\.io\/hara-packages\/hara-lang\.hara"/);
   assert.match(body, /:specs \{:oci\/repository "ghcr\.io\/hara-packages\/hara-lang\.hara\.specs"/);
   assert.match(body, /:registry\/namespaces \{\}/);
+});
+
+test("registry exposes semantic source/spec pairs alongside the root package", () => {
+  const body = registryDocument([entry, semanticEntry]);
+  assert.match(body, /"hara:hara\/lang\.core"/);
+  assert.match(body, /hara-lang\.hara\.packages\.hara\.lang\.core/);
+  assert.match(body, /hara-lang\.hara\.packages\.hara\.lang\.core\.specs/);
 });
 
 test("tap discovery is GitHub-governed and has no identity-registry dependency", async () => {

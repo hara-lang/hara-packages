@@ -50,14 +50,14 @@ jobs:
           npx --yes netlify-cli build
           npx --yes netlify-cli deploy --prod --dir site --message "testing ${GITHUB_SHA}"
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_TESTING_SITE_ID }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.HARA_NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ vars.HARA_PACKAGES_NETLIFY_TESTING_SITE_ID }}
       - name: Reconcile packages.testing.hara-lang.org
         if: github.ref_name == 'testing'
         run: bash .github/scripts/reconcile-netlify-domain.sh
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_TESTING_SITE_ID }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.HARA_NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ vars.HARA_PACKAGES_NETLIFY_TESTING_SITE_ID }}
           NETLIFY_CUSTOM_DOMAIN: packages.testing.hara-lang.org
       - name: Verify testing static assets
         if: github.ref_name == 'testing'
@@ -77,14 +77,14 @@ jobs:
           npx --yes netlify-cli build
           npx --yes netlify-cli deploy --prod --dir site --message "main ${GITHUB_SHA}"
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_PRODUCTION_SITE_ID }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.HARA_NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ vars.HARA_PACKAGES_NETLIFY_PRODUCTION_SITE_ID }}
       - name: Reconcile packages.hara-lang.org
         if: github.ref_name == 'main'
         run: bash .github/scripts/reconcile-netlify-domain.sh
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_PRODUCTION_SITE_ID }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.HARA_NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ vars.HARA_PACKAGES_NETLIFY_PRODUCTION_SITE_ID }}
           NETLIFY_CUSTOM_DOMAIN: packages.hara-lang.org
       - name: Verify production static assets
         if: github.ref_name == 'main'
